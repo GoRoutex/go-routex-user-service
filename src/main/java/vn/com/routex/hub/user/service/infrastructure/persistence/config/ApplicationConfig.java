@@ -21,7 +21,7 @@ import java.io.IOException;
 public class ApplicationConfig {
 
     @Bean
-    public static ObjectMapper getObjectMapper() {
+    public static ObjectMapper objectMapper() {
         ObjectMapper objectMapper = JsonMapper.builder()
                 .accessorNaming(new DefaultAccessorNamingStrategy.Provider().withBuilderPrefix(""))
                 .configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true)
