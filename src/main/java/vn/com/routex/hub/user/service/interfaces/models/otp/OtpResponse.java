@@ -1,7 +1,6 @@
 package vn.com.routex.hub.user.service.interfaces.models.otp;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

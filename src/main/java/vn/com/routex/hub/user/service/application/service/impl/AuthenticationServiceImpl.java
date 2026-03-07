@@ -107,7 +107,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (optUser.isPresent()) {
             User existUser = optUser.get();
             if (UserStatus.VERIFYING.equals(existUser.getStatus())) {
-                generateOtpRequestAndSendMail(request, existUser, OtpPurpose.REGSITER_VERIFY);
+                generateOtpRequestAndSendMail(request, existUser, OtpPurpose.REGISTER_VERIFY);
             }
             throw new BusinessException(request.getRequestId(), request.getRequestDateTime(), request.getChannel(),
                     ExceptionUtils.buildResultResponse(DUPLICATE_ERROR, USER_EXISTS));
@@ -151,7 +151,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         authoritiesRepository.save(userRoles);
         userRepository.save(registeredUser);
 
-        generateOtpRequestAndSendMail(request, registeredUser, OtpPurpose.REGSITER_VERIFY);
+        generateOtpRequestAndSendMail(request, registeredUser, OtpPurpose.REGISTER_VERIFY);
         /*
         - Call to verificationService for generating the url for verification
         - Enclose the OTP Plain in the email and send for user.
@@ -195,7 +195,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             if(otp.getAttemptCount() >= MAX_ATTEMPTS_OTP) {
                 otp.setStatus(OtpStatus.REVOKED);
-                generateOtpRequestAndSendMail(request, user, OtpPurpose.REGSITER_VERIFY);
+                generateOtpRequestAndSendMail(request, user, OtpPurpose.REGISTER_VERIFY);
                 throw new BusinessException(request.getRequestId(), request.getRequestDateTime(), request.getChannel(),
                         ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_FAIL_ATTEMPTS));
             }
@@ -537,7 +537,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .email(existUser.getEmail())
                         .phoneNumber(existUser.getPhoneNumber())
                         .fullName(existUser.getFullName())
-                        .purpose(OtpPurpose.REGSITER_VERIFY)
+                        .purpose(OtpPurpose.REGISTER_VERIFY)
                         .build())
                 .build();
 
