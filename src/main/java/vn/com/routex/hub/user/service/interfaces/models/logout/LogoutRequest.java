@@ -1,6 +1,7 @@
-package vn.com.routex.hub.user.service.interfaces.models.token;
+package vn.com.routex.hub.user.service.interfaces.models.logout;
 
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,19 +16,20 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class RefreshTokenRequest extends BaseRequest {
+public class LogoutRequest extends BaseRequest {
 
-    private RefreshTokenRequestData data;
+    @Valid
+    @NotNull
+    private LogoutRequestData data;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @SuperBuilder
-    public static class RefreshTokenRequestData {
+    public static class LogoutRequestData {
         @NotNull
         @NotBlank
         private String refreshToken;
     }
-
 }

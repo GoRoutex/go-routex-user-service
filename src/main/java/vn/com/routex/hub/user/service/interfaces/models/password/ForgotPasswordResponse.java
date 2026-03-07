@@ -1,4 +1,5 @@
-package vn.com.routex.hub.user.service.interfaces.models.verify;
+package vn.com.routex.hub.user.service.interfaces.models.password;
+
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,14 +11,13 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-public class VerifyCodeResponse extends BaseResponse<VerifyCodeResponse.VerifyCodeResponseData> {
+public class ForgotPasswordResponse extends BaseResponse<ForgotPasswordResponse.ForgotPasswordResponseData> {
 
     @Getter
     @Setter
     @SuperBuilder
-    public static class VerifyCodeResponseData {
+    public static class ForgotPasswordResponseData {
         private String userId;
-        private String otpCode;
-        private String status;
+        private Long expiresMinutes;
     }
 }

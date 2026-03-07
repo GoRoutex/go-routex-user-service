@@ -1,6 +1,8 @@
-package vn.com.routex.hub.user.service.interfaces.models.token;
+package vn.com.routex.hub.user.service.interfaces.models.password;
 
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,21 +15,28 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 @SuperBuilder
-public class RefreshTokenRequest extends BaseRequest {
+@NoArgsConstructor
+public class ForgotPasswordRequest extends BaseRequest {
 
-    private RefreshTokenRequestData data;
+    @Valid
+    @NotNull
+    private ForgotPasswordRequestData data;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @SuperBuilder
-    public static class RefreshTokenRequestData {
+    public static class ForgotPasswordRequestData {
+
         @NotNull
         @NotBlank
-        private String refreshToken;
-    }
+        private String username;
 
+        @Email
+        @NotNull
+        @NotBlank
+        private String email;
+    }
 }

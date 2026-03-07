@@ -1,17 +1,14 @@
 package vn.com.routex.hub.user.service.domain.user;
 
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,8 +17,6 @@ import vn.com.routex.hub.user.service.domain.auditing.AbstractAuditingEntity;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -50,12 +45,14 @@ public class User extends AbstractAuditingEntity {
     @Column(name = "PHONE_NUMBER", nullable = false)
     private String phoneNumber;
 
+    @Builder.Default
     @Column(name = "PHONE_VERIFIED")
     private Boolean phoneVerified = false;
 
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
+    @Builder.Default
     @Column(name = "EMAIL_VERIFIED")
     private Boolean emailVerified = false;
 
@@ -72,6 +69,7 @@ public class User extends AbstractAuditingEntity {
     @Column(name = "TIME_ZONE")
     private String timezone;
 
+    @Builder.Default
     @Column(name = "FAIL_LOGIN_COUNT")
     private Integer failLoginCount = 0;
 

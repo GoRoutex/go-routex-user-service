@@ -1,7 +1,6 @@
 package vn.com.routex.hub.user.service.interfaces.models.otp;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,17 +9,12 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class OtpResponse extends BaseResponse {
-
-    private OtpResponseData data;
+public class OtpResponse extends BaseResponse<OtpResponse.OtpResponseData> {
 
     @Getter
     @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
     @SuperBuilder
     public static class OtpResponseData {
         private String plainOtp;
