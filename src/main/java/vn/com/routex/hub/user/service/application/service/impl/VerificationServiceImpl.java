@@ -3,11 +3,11 @@ package vn.com.routex.hub.user.service.application.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.com.routex.hub.user.service.application.service.EmailService;
 import vn.com.routex.hub.user.service.application.service.VerificationService;
 import vn.com.routex.hub.user.service.domain.otp.Otp;
 import vn.com.routex.hub.user.service.domain.otp.OtpPurpose;
 import vn.com.routex.hub.user.service.domain.otp.OtpRepository;
+import vn.com.routex.hub.user.service.domain.otp.OtpStatus;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
 import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 import vn.com.routex.hub.user.service.interfaces.models.otp.OtpRequest;
@@ -19,7 +19,9 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.OTP_LENGTH;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.BusinessConstant.EXPIRED_OTP_MINUTES;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.BusinessConstant.OTP_LENGTH;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.BusinessConstant.RESEND_COOLDOWN_SECONDS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_COOL_DOWN;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_COOL_DOWN_MESSAGE;
 
@@ -31,16 +33,12 @@ public class VerificationServiceImpl implements VerificationService {
     private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom = new SecureRandom();
 
-    private final long RESEND_COOLDOWN_SECONDS = 120;
-    private final long EXPIRED_OTP_MINUTES = 20;
-
     @Override
-    public OtpResponse createClientOtp(OtpRequest request) {
-        otpRepository.findLatestActiveOtp(request.getData().getUserId(), OtpPurpose.REGSITER_VERIFY)
+    public OtpResponse createClientOtp(OtpRequest request, OtpPurpose otpPurpose) {
+        otpRepository.findLatestActiveOtp(request.getData().getUserId(), otpPurpose)
                 .ifPresent(existing -> {
                     if(existing.getProducedAt() != null) {
                         long seconds = Duration.between(existing.getProducedAt(), OffsetDateTime.now()).getSeconds();
-
                         if (seconds < RESEND_COOLDOWN_SECONDS) {
                             throw new BusinessException(request.getRequestId(), request.getRequestDateTime(), request.getChannel(),
                                     ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE));
@@ -60,6 +58,7 @@ public class VerificationServiceImpl implements VerificationService {
                 .expiredAt(OffsetDateTime.now().plusMinutes(20))
                 .producedAt(OffsetDateTime.now())
                 .otpHash(passwordEncoder.encode(plainOtp))
+                .status(OtpStatus.ACTIVE)
                 .attemptCount(0)
                 .purpose(OtpPurpose.REGSITER_VERIFY)
                 .expiredAt(OffsetDateTime.now().plusMinutes(EXPIRED_OTP_MINUTES))

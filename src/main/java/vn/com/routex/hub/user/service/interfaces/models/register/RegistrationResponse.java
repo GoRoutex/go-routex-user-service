@@ -12,16 +12,12 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class RegistrationResponse extends BaseResponse {
-    private RegistrationResponseData data;
+public class RegistrationResponse extends BaseResponse<RegistrationResponse.RegistrationResponseData> {
 
     @Getter
     @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
     @SuperBuilder
     public static class RegistrationResponseData {
         private String userName;

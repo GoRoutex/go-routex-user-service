@@ -21,7 +21,7 @@ import java.time.OffsetDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "OTP")
 public class Otp extends AbstractAuditingEntity {
@@ -44,6 +44,10 @@ public class Otp extends AbstractAuditingEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "PURPOSE", nullable = false)
     private OtpPurpose purpose;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS", nullable = false)
+    private OtpStatus status;
 
     @Column(name = "OTP_HASH", nullable = false)
     private String otpHash;

@@ -4,16 +4,17 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.com.routex.hub.user.service.domain.user.Authorities;
 import vn.com.routex.hub.user.service.domain.user.AuthoritiesRepository;
 import vn.com.routex.hub.user.service.domain.user.User;
 
 import javax.crypto.SecretKey;
-import java.sql.Date;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,21 @@ public class JwtService {
 
     public String extractUserId(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    public String extractTokenType(String token) {
+        Object tokenType = extractAllClaims(token).get("tokenType");
+        return tokenType == null ? null : tokenType.toString();
+    }
+
+    public OffsetDateTime extractIssuedAt(String token) {
+        Date issuedAt = extractAllClaims(token).getIssuedAt();
+        return issuedAt == null ? null : OffsetDateTime.ofInstant(issuedAt.toInstant(), ZoneOffset.UTC);
+    }
+
+    public OffsetDateTime extractExpiration(String token) {
+        Date expiration = extractAllClaims(token).getExpiration();
+        return expiration == null ? null : OffsetDateTime.ofInstant(expiration.toInstant(), ZoneOffset.UTC);
     }
 
     public boolean isRefreshToken(String token) {

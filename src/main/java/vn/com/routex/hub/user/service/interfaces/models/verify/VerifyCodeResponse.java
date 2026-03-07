@@ -9,17 +9,12 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class VerifyCodeResponse extends BaseResponse {
-
-    private VerifyCodeResponseData data;
+public class VerifyCodeResponse extends BaseResponse<VerifyCodeResponse.VerifyCodeResponseData> {
 
     @Getter
     @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
     @SuperBuilder
     public static class VerifyCodeResponseData {
         private String userId;

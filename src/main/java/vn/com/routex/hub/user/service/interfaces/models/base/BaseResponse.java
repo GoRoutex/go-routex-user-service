@@ -16,9 +16,10 @@ import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseResponse {
+public class BaseResponse<T> {
     private String requestId;
     private String requestDateTime;
     private String channel;
     private ApiResult result;
+    private T data;
 }

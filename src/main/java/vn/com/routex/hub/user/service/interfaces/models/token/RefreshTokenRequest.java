@@ -17,7 +17,17 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 @SuperBuilder
 public class RefreshTokenRequest extends BaseRequest {
 
-    @NotNull
-    @NotBlank
-    private String refreshToken;
+    private RefreshTokenRequestData data;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @SuperBuilder
+    public static class RefreshTokenRequestData {
+        @NotNull
+        @NotBlank
+        private String refreshToken;
+    }
+
 }
