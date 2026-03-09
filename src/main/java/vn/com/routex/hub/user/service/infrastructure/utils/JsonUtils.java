@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.experimental.UtilityClass;
-import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BaseException;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
 
 import java.io.IOException;
