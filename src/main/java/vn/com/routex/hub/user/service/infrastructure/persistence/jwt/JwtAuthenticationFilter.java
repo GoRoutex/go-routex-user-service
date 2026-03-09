@@ -8,27 +8,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
-import vn.com.routex.hub.user.service.domain.role.Authorities;
 import vn.com.routex.hub.user.service.domain.role.AuthoritiesRepository;
-import vn.com.routex.hub.user.service.domain.user.User;
 import vn.com.routex.hub.user.service.domain.user.UserRepository;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 
 import java.io.IOException;
-import java.security.Security;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
