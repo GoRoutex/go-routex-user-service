@@ -11,11 +11,13 @@ import vn.com.routex.hub.user.service.application.service.AuthenticationService;
 import vn.com.routex.hub.user.service.application.service.VerificationService;
 import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
 import vn.com.routex.hub.user.service.application.service.email.EmailService;
+import vn.com.routex.hub.user.service.domain.customer.Customer;
+import vn.com.routex.hub.user.service.domain.customer.CustomerRepository;
+import vn.com.routex.hub.user.service.domain.customer.CustomerStatus;
 import vn.com.routex.hub.user.service.domain.otp.Otp;
 import vn.com.routex.hub.user.service.domain.otp.OtpPurpose;
 import vn.com.routex.hub.user.service.domain.otp.OtpRepository;
 import vn.com.routex.hub.user.service.domain.otp.OtpStatus;
-import vn.com.routex.hub.user.service.domain.role.AuthoritiesRepository;
 import vn.com.routex.hub.user.service.domain.role.Roles;
 import vn.com.routex.hub.user.service.domain.role.RolesList;
 import vn.com.routex.hub.user.service.domain.role.RolesRepository;
@@ -96,7 +98,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final VerificationService verificationService;
-    private final AuthoritiesRepository authoritiesRepository;
+    private final CustomerRepository customerRepository;
     private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
@@ -134,9 +136,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String tenantId = request.getData().getTenantId();
         String timezone = request.getData().getTimeZone();
         String language = request.getData().getLanguage();
+
+        String userId = UUID.randomUUID().toString();
         // Register user with VERIFYING Status.
         User registeredUser = User.builder()
-                .id(UUID.randomUUID().toString())
+                .id(userId)
                 .username(request.getData().getUsername())
                 .fullName(request.getData().getFullName())
                 .passwordHash(passwordEncoder.encode(request.getData().getPassword()))
@@ -152,6 +156,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .timezone(timezone != null ? request.getData().getTimeZone() : null)
                 .build();
 
+        Customer customer = Customer.builder()
+                        .id(UUID.randomUUID().toString())
+                                .userId(userId)
+                                        .status(CustomerStatus.ACTIVE)
+                                                .build();
+
+
+        customerRepository.save(customer);
         userRepository.save(registeredUser);
 
         Roles customerRole = rolesRepository.findByCode(RolesList.CUSTOMER.name())
