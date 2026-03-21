@@ -6,8 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
-import vn.com.routex.hub.user.service.domain.role.AuthoritiesRepository;
-import vn.com.routex.hub.user.service.domain.user.User;
+import vn.com.routex.hub.user.service.domain.user.model.User;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -25,13 +24,11 @@ public class JwtService {
 
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
-    private final AuthoritiesRepository authoritiesRepository;
     private final UserAuthorizationService userAuthorizationService;
 
-    public JwtService(JwtProperties jwtProperties, AuthoritiesRepository authoritiesRepository, UserAuthorizationService userAuthorizationService) {
+    public JwtService(JwtProperties jwtProperties, UserAuthorizationService userAuthorizationService) {
         this.jwtProperties = jwtProperties;
         this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
-        this.authoritiesRepository = authoritiesRepository;
         this.userAuthorizationService = userAuthorizationService;
     }
     /*
@@ -70,6 +67,7 @@ public class JwtService {
                 .issuer(jwtProperties.getIssuer())
                 .subject(user.getId())
                 .claim("type", "refresh")
+                .claim("tokenType", "REFRESH")
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(secretKey)

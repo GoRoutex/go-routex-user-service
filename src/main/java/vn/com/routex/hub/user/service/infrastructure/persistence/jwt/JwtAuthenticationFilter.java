@@ -13,10 +13,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
-import vn.com.routex.hub.user.service.domain.role.AuthoritiesRepository;
-import vn.com.routex.hub.user.service.domain.user.UserRepository;
-import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -29,10 +25,7 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserRepository userRepository;
-    private final AuthoritiesRepository authoritiesRepository;
-    private final UserAuthorizationService userAuthorizationService;
-    private final SystemLog sLog = SystemLog.getLogger(this.getClass());
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,

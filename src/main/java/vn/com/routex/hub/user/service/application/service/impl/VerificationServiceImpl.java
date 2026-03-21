@@ -3,15 +3,14 @@ package vn.com.routex.hub.user.service.application.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationCommand;
+import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationResult;
 import vn.com.routex.hub.user.service.application.service.VerificationService;
-import vn.com.routex.hub.user.service.domain.otp.Otp;
-import vn.com.routex.hub.user.service.domain.otp.OtpPurpose;
-import vn.com.routex.hub.user.service.domain.otp.OtpRepository;
-import vn.com.routex.hub.user.service.domain.otp.OtpStatus;
+import vn.com.routex.hub.user.service.domain.otp.model.Otp;
+import vn.com.routex.hub.user.service.domain.otp.model.OtpStatus;
+import vn.com.routex.hub.user.service.domain.otp.port.OtpRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
 import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
-import vn.com.routex.hub.user.service.interfaces.models.otp.OtpRequest;
-import vn.com.routex.hub.user.service.interfaces.models.otp.OtpResponse;
 
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -29,57 +28,52 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
 
-    private final OtpRepository otpRepository;
+    private final OtpRepositoryPort otpRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom = new SecureRandom();
 
     @Override
-    public OtpResponse createClientOtp(OtpRequest request, OtpPurpose otpPurpose) {
-        otpRepository.findLatestActiveOtp(request.getData().getUserId(), otpPurpose)
+    public OtpGenerationResult createClientOtp(OtpGenerationCommand command) {
+        otpRepositoryPort.findLatestActiveOtp(command.getUserId(), command.getPurpose())
                 .ifPresent(existing -> {
-                    if(existing.getProducedAt() != null) {
+                    if (existing.getProducedAt() != null) {
                         long seconds = Duration.between(existing.getProducedAt(), OffsetDateTime.now()).getSeconds();
                         if (seconds < RESEND_COOLDOWN_SECONDS) {
-                            throw new BusinessException(request.getRequestId(), request.getRequestDateTime(), request.getChannel(),
-                                    ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE));
+                            throw new BusinessException(
+                                    command.getContext().getRequestId(),
+                                    command.getContext().getRequestDateTime(),
+                                    command.getContext().getChannel(),
+                                    ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE)
+                            );
                         }
                     }
                 });
 
         String plainOtp = generateOtp();
-
         Otp otp = Otp.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(request.getData().getUserId())
-                .fullName(request.getData().getFullName())
-                .phoneNumber(request.getData().getPhoneNumber())
-                .email(request.getData().getEmail())
-                .purpose(request.getData().getPurpose())
-                .expiredAt(OffsetDateTime.now().plusMinutes(20))
+                .userId(command.getUserId())
+                .fullName(command.getFullName())
+                .phoneNumber(command.getPhoneNumber())
+                .email(command.getEmail())
+                .purpose(command.getPurpose())
+                .expiredAt(OffsetDateTime.now().plusMinutes(EXPIRED_OTP_MINUTES))
                 .producedAt(OffsetDateTime.now())
                 .otpHash(passwordEncoder.encode(plainOtp))
                 .status(OtpStatus.ACTIVE)
                 .attemptCount(0)
                 .createdAt(OffsetDateTime.now())
-                .purpose(OtpPurpose.REGISTER_VERIFY)
-                .expiredAt(OffsetDateTime.now().plusMinutes(EXPIRED_OTP_MINUTES))
                 .build();
 
-        otpRepository.save(otp);
+        otpRepositoryPort.save(otp);
 
         long expiresMinutes = ChronoUnit.MINUTES.between(OffsetDateTime.now(), otp.getExpiredAt());
-
-        return OtpResponse.builder()
-                .requestId(request.getRequestId())
-                .requestDateTime(request.getRequestDateTime())
-                .channel(request.getChannel())
-                .data(OtpResponse.OtpResponseData.builder()
-                        .plainOtp(plainOtp)
-                        .userId(request.getData().getUserId())
-                        .fullName(request.getData().getFullName())
-                        .email(request.getData().getEmail())
-                        .expiresMinutes(expiresMinutes)
-                        .build())
+        return OtpGenerationResult.builder()
+                .plainOtp(plainOtp)
+                .userId(command.getUserId())
+                .fullName(command.getFullName())
+                .email(command.getEmail())
+                .expiresMinutes(expiresMinutes)
                 .build();
     }
 
