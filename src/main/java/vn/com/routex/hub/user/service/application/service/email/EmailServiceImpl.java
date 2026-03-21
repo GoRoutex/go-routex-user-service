@@ -10,8 +10,8 @@ import com.sendgrid.helpers.mail.objects.Email;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
+import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
 import vn.com.routex.hub.user.service.infrastructure.persistence.config.SendGridMailProperties;
-import vn.com.routex.hub.user.service.interfaces.models.email.EmailSendingRequest;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,10 +24,11 @@ public class EmailServiceImpl implements EmailService {
 
     private final EmailTemplateService emailTemplateService;
     private final SendGridMailProperties properties;
-    @Override
-    public void sendEmail(EmailSendingRequest request) {
 
-        Map<String, Object> variables = getStringObjectMap(request);
+    @Override
+    public void sendEmail(EmailMessageCommand command) {
+
+        Map<String, Object> variables = getStringObjectMap(command);
 
         String htmlBody = emailTemplateService.processTemplate(
                 "email/verification-code",
@@ -35,7 +36,7 @@ public class EmailServiceImpl implements EmailService {
         );
 
         Email from = new Email(properties.getFromEmail(), properties.getFromName());
-        Email to = new Email(request.getData().getToEmail());
+        Email to = new Email(command.getToEmail());
         Content content = new Content("text/html", htmlBody);
         Mail mail = new Mail(from, properties.getVerifySubject(), to, content);
 
@@ -60,14 +61,14 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private @NonNull Map<String, Object> getStringObjectMap(EmailSendingRequest request) {
+    private @NonNull Map<String, Object> getStringObjectMap(EmailMessageCommand command) {
         String verifyLink =
-                properties.getBaseUrl() + "/api/v1/user-service/authentication/verify/" + request.getData().getUserId();
+                properties.getBaseUrl() + "/api/v1/user-service/authentication/verify/" + command.getUserId();
 
         Map<String, Object> variables = new HashMap<>();
-        variables.put("fullName", (request.getData().getFullName() == null || request.getData().getFullName().isBlank()) ? "bạn" : request.getData().getFullName());
-        variables.put("otpCode", request.getData().getVerificationCode());
-        variables.put("expiredMinutes", request.getData().getExpireMinutes());
+        variables.put("fullName", (command.getFullName() == null || command.getFullName().isBlank()) ? "bạn" : command.getFullName());
+        variables.put("otpCode", command.getVerificationCode());
+        variables.put("expiredMinutes", command.getExpireMinutes());
         variables.put("verifyLink", verifyLink);
         return variables;
     }

@@ -1,10 +1,10 @@
 package vn.com.routex.hub.user.service.application.service.email;
 
 
-import vn.com.routex.hub.user.service.interfaces.models.email.EmailSendingRequest;
+import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
 
 public interface EmailService {
 
-    void sendEmail(EmailSendingRequest request);
+    void sendEmail(EmailMessageCommand command);
 
 }
