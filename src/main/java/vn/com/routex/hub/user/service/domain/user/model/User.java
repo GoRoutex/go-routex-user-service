@@ -31,6 +31,8 @@ public class User extends AbstractAuditingEntity {
 
     private String phoneNumber;
 
+    private String customerMembershipId;
+
     @Builder.Default
     private Boolean phoneVerified = false;
 

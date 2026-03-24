@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
+import vn.com.routex.hub.user.service.application.service.EmailService;
 import vn.com.routex.hub.user.service.infrastructure.persistence.config.SendGridMailProperties;
 
 import java.io.IOException;

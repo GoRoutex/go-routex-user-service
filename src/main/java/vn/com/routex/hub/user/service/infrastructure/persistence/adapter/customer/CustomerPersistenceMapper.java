@@ -2,13 +2,13 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.custom
 
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerJpaEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerEntity;
 
 @Component
 public class CustomerPersistenceMapper {
 
-    public CustomerJpaEntity toJpaEntity(Customer customer) {
-        return CustomerJpaEntity.builder()
+    public CustomerEntity toJpaEntity(Customer customer) {
+        return CustomerEntity.builder()
                 .id(customer.getId())
                 .userId(customer.getUserId())
                 .status(customer.getStatus())
@@ -22,18 +22,18 @@ public class CustomerPersistenceMapper {
                 .build();
     }
 
-    public Customer toDomain(CustomerJpaEntity customerJpaEntity) {
+    public Customer toDomain(CustomerEntity customerEntity) {
         return Customer.builder()
-                .id(customerJpaEntity.getId())
-                .userId(customerJpaEntity.getUserId())
-                .status(customerJpaEntity.getStatus())
-                .totalTrips(customerJpaEntity.getTotalTrips())
-                .totalSpent(customerJpaEntity.getTotalSpent())
-                .tripPoints(customerJpaEntity.getTripPoints())
-                .createdAt(customerJpaEntity.getCreatedAt())
-                .createdBy(customerJpaEntity.getCreatedBy())
-                .updatedAt(customerJpaEntity.getUpdatedAt())
-                .updatedBy(customerJpaEntity.getUpdatedBy())
+                .id(customerEntity.getId())
+                .userId(customerEntity.getUserId())
+                .status(customerEntity.getStatus())
+                .totalTrips(customerEntity.getTotalTrips())
+                .totalSpent(customerEntity.getTotalSpent())
+                .tripPoints(customerEntity.getTripPoints())
+                .createdAt(customerEntity.getCreatedAt())
+                .createdBy(customerEntity.getCreatedBy())
+                .updatedAt(customerEntity.getUpdatedAt())
+                .updatedBy(customerEntity.getUpdatedBy())
                 .build();
     }
 }

@@ -36,6 +36,9 @@ public class UserJpaEntity extends AbstractAuditingJpaEntity {
     @Column(name = "FULL_NAME", nullable = false)
     private String fullName;
 
+    @Column(name = "CUSTOMER_MEMBERSHIP_ID")
+    private String customerMembershipId;
+
     @Column(name = "PASSWORD_HASH", nullable = false)
     private String passwordHash;
 
