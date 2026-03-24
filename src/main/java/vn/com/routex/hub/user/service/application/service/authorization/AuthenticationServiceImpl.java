@@ -1,4 +1,4 @@
-package vn.com.routex.hub.user.service.application.service.impl;
+package vn.com.routex.hub.user.service.application.service.authorization;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,7 @@ import vn.com.routex.hub.user.service.application.dto.verification.OtpGeneration
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationResult;
 import vn.com.routex.hub.user.service.application.service.AuthenticationService;
 import vn.com.routex.hub.user.service.application.service.VerificationService;
-import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
-import vn.com.routex.hub.user.service.application.service.email.EmailService;
+import vn.com.routex.hub.user.service.application.service.EmailService;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
 import vn.com.routex.hub.user.service.domain.customer.model.CustomerStatus;
 import vn.com.routex.hub.user.service.domain.customer.port.CustomerRepositoryPort;
@@ -80,7 +79,6 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_EXPIRED_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.ROLE_NOT_FOUND_ERROR;
-import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_CODE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USERNAME_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_NOT_ACTIVE_MESSAGE;

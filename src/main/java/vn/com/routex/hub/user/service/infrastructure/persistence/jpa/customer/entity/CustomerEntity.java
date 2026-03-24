@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 @SuperBuilder
 @Entity
 @Table(name = "CUSTOMER")
-public class CustomerJpaEntity extends AbstractAuditingJpaEntity {
+public class CustomerEntity extends AbstractAuditingJpaEntity {
 
     @Id
     private String id;

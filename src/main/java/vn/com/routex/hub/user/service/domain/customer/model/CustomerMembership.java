@@ -1,8 +1,6 @@
 package vn.com.routex.hub.user.service.domain.customer.model;
 
-
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,27 +10,19 @@ import vn.com.routex.hub.user.service.domain.auditing.AbstractAuditingEntity;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Customer extends AbstractAuditingEntity {
-
+public class CustomerMembership extends AbstractAuditingEntity {
     private String id;
-
-    private String userId;
-
-    private CustomerStatus status;
-
-    private OffsetDateTime lastTripAt;
-
-    @Builder.Default
-    private Integer totalTrips = 0;
-
-    @Builder.Default
-    private BigDecimal totalSpent = BigDecimal.ZERO;
-
-    @Builder.Default
-    private BigDecimal tripPoints = BigDecimal.ZERO;
+    private String membershipTierId;
+    private BigDecimal currentAvailablePoints; // Available points for gift exchanging
+    private BigDecimal totalPoints; // Total points for promotion evaluating.
+    private BigDecimal totalSpent;
+    private Integer totalTrips;
+    private OffsetDateTime promotedAt;
+    private CustomerMembershipStatus status;
 }

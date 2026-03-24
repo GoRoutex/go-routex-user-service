@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.1</version>
+		<version>4.1.0-M3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>vn.com.routex.hub</groupId>
@@ -118,12 +118,6 @@
 			<version>0.12.6</version>
 			<scope>runtime</scope>
 		</dependency>
-
-<!--		<dependency>-->
-<!--			<groupId>vn.com.go.routex</groupId>-->
-<!--			<artifactId>identity-security-spring-boot-starter</artifactId>-->
-<!--			<version>0.0.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

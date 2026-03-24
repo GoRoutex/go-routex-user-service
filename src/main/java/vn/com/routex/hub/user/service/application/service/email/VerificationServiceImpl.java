@@ -1,4 +1,4 @@
-package vn.com.routex.hub.user.service.application.service.impl;
+package vn.com.routex.hub.user.service.application.service.email;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

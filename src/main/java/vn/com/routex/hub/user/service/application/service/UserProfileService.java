@@ -1,0 +1,17 @@
+package vn.com.routex.hub.user.service.application.service;
+
+import vn.com.routex.hub.user.service.application.dto.membership.GetMyMembershipCommand;
+import vn.com.routex.hub.user.service.application.dto.membership.GetMyMembershipResult;
+import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileCommand;
+import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileResult;
+import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileCommand;
+import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileResult;
+
+public interface UserProfileService {
+
+    GetUserProfileResult  getUserProfile(GetUserProfileCommand command);
+
+    GetMyProfileResult getMyProfile(GetMyProfileCommand command);
+
+    GetMyMembershipResult getMyMembership(GetMyMembershipCommand command);
+}

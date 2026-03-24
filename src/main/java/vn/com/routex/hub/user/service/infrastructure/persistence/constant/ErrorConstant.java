@@ -9,6 +9,7 @@ public class ErrorConstant {
     public static final String TIMEOUT_ERROR_MESSAGE = "Timeout";
     public static final String RECORD_NOT_FOUND = "1407";
     public static final String INVALID_USERNAME_EMAIL_MESSAGE = "Username or email is incorrect";
+    public static final String SPRING_DATA_NOT_FOUND_MESSAGE = "Customer membership information not found";
 
     public static final String RECORD_NOT_FOUND_MESSAGE = "Record not found";
     public static final String OTP_NOT_FOUND_MESSAGE = "OTP Firm not found";
@@ -16,9 +17,10 @@ public class ErrorConstant {
     public static final String SUCCESS_MESSAGE = "Success";
     public static final String DRIVER_NOT_FOND_MESSAGE = "Driver Profile not found";
     public static final String USER_NOT_FOUND_MESSAGE = "User Profile not found";
-
+    public static final String MEMBERSHIP_NOT_FOUND_MESSAGE = "Membership not found";
+    public static final String CUSTOMER_NOT_FOUND_MESSAGE = "Customer profile not found";
     public static final String REFRESH_TOKEN_NOT_FOUND_MESSAGE = "Refresh token not found!";
-
+    public static final String CUSTOMER_MEMBERSHIP_NOT_FOUND_MESSAGE = "Customer Membership not found!";
     public static final String REFRESH_TOKEN_EXPIRED_MESSAGE = "Refresh token is expired";
     public static final String INVALID_HTTP_REQUEST_RESOURCE_ERROR = "4000";
     public static final String INVALID_HTTP_REQUEST_RESOURCE_ERROR_MESSAGE = "Resource %s path is not exists";
