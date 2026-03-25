@@ -35,19 +35,24 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public OtpGenerationResult createClientOtp(OtpGenerationCommand command) {
         otpRepositoryPort.findLatestActiveOtp(command.getUserId(), command.getPurpose())
-                .ifPresent(existing -> {
-                    if (existing.getProducedAt() != null) {
-                        long seconds = Duration.between(existing.getProducedAt(), OffsetDateTime.now()).getSeconds();
-                        if (seconds < RESEND_COOLDOWN_SECONDS) {
-                            throw new BusinessException(
-                                    command.getContext().getRequestId(),
-                                    command.getContext().getRequestDateTime(),
-                                    command.getContext().getChannel(),
-                                    ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE)
-                            );
-                        }
+            .ifPresent(existing -> {
+                if (existing.getProducedAt() != null) {
+                    long seconds = Duration.between(existing.getProducedAt(), OffsetDateTime.now()).getSeconds();
+                    if (seconds < RESEND_COOLDOWN_SECONDS) {
+                        throw new BusinessException(
+                                command.getContext().getRequestId(),
+                                command.getContext().getRequestDateTime(),
+                                command.getContext().getChannel(),
+                                ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE)
+                        );
                     }
-                });
+                }
+
+                existing.setStatus(OtpStatus.REVOKED);
+                existing.setUpdatedAt(OffsetDateTime.now());
+                existing.setExpiredAt(OffsetDateTime.now());
+                otpRepositoryPort.save(existing);
+            });
 
         String plainOtp = generateOtp();
         Otp otp = Otp.builder()
@@ -73,6 +78,7 @@ public class VerificationServiceImpl implements VerificationService {
                 .userId(command.getUserId())
                 .fullName(command.getFullName())
                 .email(command.getEmail())
+                .expiredAt(otp.getExpiredAt())
                 .expiresMinutes(expiresMinutes)
                 .build();
     }
