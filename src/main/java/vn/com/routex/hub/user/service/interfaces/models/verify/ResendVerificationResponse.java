@@ -10,14 +10,12 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
 public class ResendVerificationResponse extends BaseResponse<ResendVerificationResponse.ResendVerificationResponseData> {
 
     @Getter
     @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
     @SuperBuilder
     public static class ResendVerificationResponseData {
