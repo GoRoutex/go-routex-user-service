@@ -14,6 +14,8 @@ import vn.com.routex.hub.user.service.application.dto.authentication.Registratio
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
+import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationCommand;
+import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationResult;
 
 public interface AuthenticationService {
 
@@ -29,5 +31,7 @@ public interface AuthenticationService {
 
     RefreshTokenResult refreshToken(RefreshTokenCommand command);
 
-    LogoutResult logout(LogoutCommand command);
+    void logout(LogoutCommand command);
+
+    ResendVerificationResult resendVerificationCode(ResendVerificationCommand build);
 }

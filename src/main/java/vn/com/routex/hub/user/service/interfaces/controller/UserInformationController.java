@@ -41,40 +41,6 @@ public class UserInformationController {
 
     private final UserProfileService userProfileService;
 
-
-    @GetMapping(PROFILE_PATH + ME_PATH + MEMBERSHIP_PATH)
-    public ResponseEntity<GetMyMembershipResponse> getMyMembership(@RequestParam String userId) {
-
-        GetMyMembershipResult result = userProfileService.getMyMembership(GetMyMembershipCommand
-                    .builder()
-                    .userId(userId)
-                    .build());
-
-        return ResponseEntity.ok(GetMyMembershipResponse
-                        .builder()
-                        .result(ApiResult.builder()
-                                .responseCode(SUCCESS_CODE)
-                                .description(SUCCESS_MESSAGE)
-                                .build())
-                        .data(GetMyMembershipResponse.GetMyMembershipResponseData
-                                .builder()
-                                .userId(userId)
-                                .currentPoint(result.getCurrentPoint())
-                                .discountPercent(result.getBenefit().getDiscountPercent())
-                                .priorityLevel(result.getBenefit().getPriorityLevel())
-                                .build())
-                        .stats(GetMyMembershipResponse.GetMyMembershipStats
-                                .builder()
-                                .badge(result.getBenefit().getBadge())
-                                .totalTrips(result.getBenefit().getTotalTrips())
-                                .totalSpent(result.getBenefit().getTotalSpent())
-                                .pointMultiplier(result.getBenefit().getPointMultiplier())
-                                .pointToNextTier(result.getBenefit().getPointToNextTier())
-                                .nextTierName(result.getBenefit().getNextTierName())
-                                .build())
-                        .build());
-
-    }
     @GetMapping(PROFILE_PATH + ME_PATH)
     public ResponseEntity<GetMyProfileResponse> getMyProfile(
             @RequestParam String userId) {

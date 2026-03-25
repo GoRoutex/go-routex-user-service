@@ -19,6 +19,8 @@ import vn.com.routex.hub.user.service.application.dto.authentication.Registratio
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
+import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationCommand;
+import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationResult;
 import vn.com.routex.hub.user.service.application.service.AuthenticationService;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 import vn.com.routex.hub.user.service.interfaces.models.login.LoginRequest;
@@ -32,6 +34,8 @@ import vn.com.routex.hub.user.service.interfaces.models.password.ForgotPasswordR
 import vn.com.routex.hub.user.service.interfaces.models.register.RegistrationRequest;
 import vn.com.routex.hub.user.service.interfaces.models.register.RegistrationResponse;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
+import vn.com.routex.hub.user.service.interfaces.models.verify.ResendVerificationRequest;
+import vn.com.routex.hub.user.service.interfaces.models.verify.ResendVerificationResponse;
 import vn.com.routex.hub.user.service.interfaces.models.verify.VerifyCodeRequest;
 import vn.com.routex.hub.user.service.interfaces.models.verify.VerifyCodeResponse;
 
@@ -43,6 +47,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.LOGIN;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.LOGOUT;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.REGISTER;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.RESEND_VERIFY_CODE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.USER_SERVICE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.VERIFY_CODE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_CODE;
@@ -155,6 +160,7 @@ public class AuthenticationController {
                 .build());
     }
 
+
     @PostMapping(AUTHENTICATION + FORGOT_PASSWORD)
     public ResponseEntity<ForgotPasswordResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         ForgotPasswordResult result = authenticationService.forgotPassword(ForgotPasswordCommand.builder()
@@ -175,6 +181,7 @@ public class AuthenticationController {
                 .build());
     }
 
+
     @PostMapping(AUTHENTICATION + LOGOUT)
     public ResponseEntity<LogoutResponse> logout(@Valid @RequestBody LogoutRequest request) {
         authenticationService.logout(LogoutCommand.builder()
@@ -189,6 +196,32 @@ public class AuthenticationController {
                 .result(successResult())
                 .build());
     }
+
+
+    @PostMapping(AUTHENTICATION + RESEND_VERIFY_CODE)
+    public ResponseEntity<ResendVerificationResponse> resendVerificationCode(@Valid @RequestBody ResendVerificationRequest request) {
+        ResendVerificationResult result = authenticationService.resendVerificationCode(ResendVerificationCommand.builder()
+                .context(toContext(request))
+                .email(request.getData().getEmail())
+                .build());
+
+        ResendVerificationResponse response = ResendVerificationResponse.builder()
+                .requestId(request.getRequestId())
+                .requestDateTime(request.getRequestDateTime())
+                .channel(request.getChannel())
+                .result(ApiResult.builder()
+                        .responseCode(SUCCESS_CODE)
+                        .description(SUCCESS_MESSAGE)
+                        .build())
+                .data(ResendVerificationResponse.ResendVerificationResponseData.builder()
+                        .retryAfterSeconds(result.getRetryAfterSeconds())
+                        .build())
+                .build();
+
+        return ResponseEntity.ok(response);
+
+    }
+
 
     private RequestContext toContext(BaseRequest request) {
         return RequestContext.builder()
