@@ -38,9 +38,6 @@ public class OtpJpaEntity extends AbstractAuditingJpaEntity {
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
-    @Column(name = "FULL_NAME", nullable = false)
-    private String fullName;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "PURPOSE", nullable = false)
     private OtpPurpose purpose;

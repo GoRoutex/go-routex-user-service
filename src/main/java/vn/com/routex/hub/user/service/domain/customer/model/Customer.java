@@ -20,19 +20,15 @@ import java.time.OffsetDateTime;
 public class Customer extends AbstractAuditingEntity {
 
     private String id;
-
     private String userId;
-
+    private String fullName;
     private CustomerStatus status;
-
-    private OffsetDateTime lastTripAt;
-
     @Builder.Default
     private Integer totalTrips = 0;
-
-    @Builder.Default
-    private BigDecimal totalSpent = BigDecimal.ZERO;
-
     @Builder.Default
     private BigDecimal tripPoints = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal totalSpent = BigDecimal.ZERO;
+    private OffsetDateTime lastBookingAt;
+    private OffsetDateTime lastTripAt;
 }

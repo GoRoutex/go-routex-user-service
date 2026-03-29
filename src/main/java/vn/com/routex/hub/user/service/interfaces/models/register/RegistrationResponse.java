@@ -17,7 +17,6 @@ public class RegistrationResponse extends BaseResponse<RegistrationResponse.Regi
     @Setter
     @SuperBuilder
     public static class RegistrationResponseData {
-        private String userName;
         private String email;
         private String phoneNumber;
         private String userId;

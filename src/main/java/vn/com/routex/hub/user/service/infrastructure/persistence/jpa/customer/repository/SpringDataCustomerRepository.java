@@ -3,14 +3,13 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.r
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.entity.UserJpaEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.entity.UserEntity;
 
 import java.util.Optional;
 
-public interface SpringDataCustomerRepository extends JpaRepository<UserJpaEntity, String> {
+public interface SpringDataCustomerRepository extends JpaRepository<UserEntity, String> {
     @Query("""
         SELECT u.id as userId,
-               c.tripPoints as tripPoints,
                c.totalTrips as totalTrips,
                c.totalSpent as totalSpent,
                t.id as currentTierId,
@@ -18,7 +17,7 @@ public interface SpringDataCustomerRepository extends JpaRepository<UserJpaEntit
                t.priorityLevel as priorityLevel,
                t.pointMultiplier as pointMultiplier,
                t.discountPercent as discountPercent
-        FROM UserJpaEntity u
+        FROM UserEntity u
         JOIN CustomerEntity c ON u.id = c.userId
         JOIN CustomerMembershipEntity cm ON u.customerMembershipId = cm.id
         JOIN MembershipTierEntity t ON cm.membershipTierId = t.id

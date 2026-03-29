@@ -30,7 +30,7 @@ public class LoginRequest extends BaseRequest {
 
         @NotBlank
         @NotNull
-        private String username;
+        private String email;
 
         @NotBlank
         @NotNull

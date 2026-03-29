@@ -25,8 +25,6 @@ public class Otp extends AbstractAuditingEntity {
 
     private String email;
 
-    private String fullName;
-
     private OtpPurpose purpose;
 
     private OtpStatus status;

@@ -26,11 +26,10 @@ public class CustomerMembershipEntity extends AbstractAuditingJpaEntity {
 
     @Id
     private String id;
+    private String customerId;
     private String membershipTierId;
     private BigDecimal currentAvailablePoints; // Available points for gift exchanging
     private BigDecimal totalPoints; // Total points for promotion evaluating.
-    private BigDecimal totalSpent;
-    private Integer totalTrips;
     private OffsetDateTime promotedAt;
     private CustomerMembershipStatus status;
 }

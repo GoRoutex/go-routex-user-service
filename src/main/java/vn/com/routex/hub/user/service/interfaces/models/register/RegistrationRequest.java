@@ -34,16 +34,6 @@ public class RegistrationRequest extends BaseRequest {
     @SuperBuilder
     public static class RegistrationRequestData {
 
-        @NotNull
-        @NotBlank
-        @Size(min = 3, max = 20)
-        private String username;
-
-        @NotNull
-        @NotBlank
-        @Size(min = 3, max = 20)
-        private String password;
-
         @Email
         @NotNull
         @NotBlank
@@ -52,14 +42,13 @@ public class RegistrationRequest extends BaseRequest {
 
         @NotNull
         @NotBlank
-        @Size(max = 10)
-        private String phoneNumber;
-
+        @Size(min = 3, max = 20)
+        private String password;
 
         @NotNull
         @NotBlank
-        @Pattern(regexp = ONLY_CHARACTER_REGEX, message = "Only characters are allowed")
-        private String fullName;
+        @Size(max = 10)
+        private String phoneNumber;
 
         @NotNull
         @NotBlank
@@ -67,7 +56,5 @@ public class RegistrationRequest extends BaseRequest {
         private String dob;
 
         private String language;
-        private String tenantId;
-        private String timeZone;
     }
 }

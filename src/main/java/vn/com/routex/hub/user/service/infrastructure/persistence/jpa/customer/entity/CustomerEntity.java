@@ -16,6 +16,7 @@ import vn.com.routex.hub.user.service.domain.customer.model.CustomerStatus;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.shared.entity.AbstractAuditingJpaEntity;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -36,15 +37,22 @@ public class CustomerEntity extends AbstractAuditingJpaEntity {
     @Column(name = "STATUS", nullable = false)
     private CustomerStatus status;
 
+    @Column(name = "FULL_NAME")
+    private String fullName;
+
     @Column(name = "TOTAL_TRIPS")
     @Builder.Default
     private Integer totalTrips = 0;
+
+    @Column(name = "TRIP_POINTS")
+    @Builder.Default
+    private BigDecimal tripPoints = BigDecimal.ZERO;
 
     @Column(name = "TOTAL_SPENT")
     @Builder.Default
     private BigDecimal totalSpent = BigDecimal.ZERO;
 
-    @Column(name = "TRIP_POINTS")
-    @Builder.Default
-    private BigDecimal tripPoints = BigDecimal.ZERO;
+    private OffsetDateTime lastBookingAt;
+
+    private OffsetDateTime lastTripAt;
 }

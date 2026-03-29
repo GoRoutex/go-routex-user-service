@@ -18,7 +18,4 @@ public class VerifyOtpCommand {
     private RequestContext context;
     private String userId;
     private String otpCode;
-    private String phoneNumber;
-    private String email;
-    private OtpPurpose purpose;
 }

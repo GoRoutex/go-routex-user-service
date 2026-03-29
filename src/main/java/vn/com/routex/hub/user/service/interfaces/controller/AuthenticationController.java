@@ -70,17 +70,15 @@ public class AuthenticationController {
 
     @PostMapping(AUTHENTICATION + REGISTER)
     public ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody RegistrationRequest request) {
+
+        String langue = request.getData().getLanguage() != null ?  request.getData().getLanguage() : "VN";
         RegistrationResult result = authenticationService.registerUser(RegistrationCommand.builder()
                 .context(toContext(request))
-                .username(request.getData().getUsername())
-                .password(request.getData().getPassword())
                 .email(request.getData().getEmail())
+                .password(request.getData().getPassword())
                 .phoneNumber(request.getData().getPhoneNumber())
-                .fullName(request.getData().getFullName())
                 .dob(request.getData().getDob())
                 .language(request.getData().getLanguage())
-                .tenantId(request.getData().getTenantId())
-                .timeZone(request.getData().getTimeZone())
                 .build());
 
         return ResponseEntity.ok(RegistrationResponse.builder()
@@ -92,7 +90,6 @@ public class AuthenticationController {
                         .userId(result.getUserId())
                         .email(result.getEmail())
                         .phoneNumber(result.getPhoneNumber())
-                        .userName(result.getUserName())
                         .status(result.getStatus())
                         .build())
                 .build());
@@ -104,9 +101,6 @@ public class AuthenticationController {
                 .context(toContext(request))
                 .userId(request.getData().getUserId())
                 .otpCode(request.getData().getOtpCode())
-                .phoneNumber(request.getData().getPhoneNumber())
-                .email(request.getData().getEmail())
-                .purpose(request.getData().getPurpose())
                 .build());
 
         return ResponseEntity.ok(VerifyCodeResponse.builder()
@@ -126,7 +120,7 @@ public class AuthenticationController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResult result = authenticationService.login(LoginCommand.builder()
                 .context(toContext(request))
-                .username(request.getData().getUsername())
+                .email(request.getData().getEmail())
                 .password(request.getData().getPassword())
                 .build());
 
@@ -139,9 +133,10 @@ public class AuthenticationController {
                         .accessToken(result.getAccessToken())
                         .refreshToken(result.getRefreshToken())
                         .userId(result.getUserId())
-                        .username(result.getUsername())
+                        .email(result.getEmail())
                         .roles(result.getRoles())
                         .authorities(result.getAuthorities())
+                        .profileCompleted(result.getProfileCompleted())
                         .build())
                 .build());
     }

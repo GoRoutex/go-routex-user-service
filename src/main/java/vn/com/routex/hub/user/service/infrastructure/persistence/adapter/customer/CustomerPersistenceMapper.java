@@ -12,13 +12,15 @@ public class CustomerPersistenceMapper {
                 .id(customer.getId())
                 .userId(customer.getUserId())
                 .status(customer.getStatus())
-                .totalTrips(customer.getTotalTrips())
-                .totalSpent(customer.getTotalSpent())
-                .tripPoints(customer.getTripPoints())
+                .fullName(customer.getFullName())
                 .createdAt(customer.getCreatedAt())
                 .createdBy(customer.getCreatedBy())
+                .totalTrips(customer.getTotalTrips())
+                .totalSpent(customer.getTotalSpent())
                 .updatedAt(customer.getUpdatedAt())
                 .updatedBy(customer.getUpdatedBy())
+                .lastBookingAt(customer.getLastBookingAt())
+                .lastTripAt(customer.getLastTripAt())
                 .build();
     }
 
@@ -27,13 +29,13 @@ public class CustomerPersistenceMapper {
                 .id(customerEntity.getId())
                 .userId(customerEntity.getUserId())
                 .status(customerEntity.getStatus())
-                .totalTrips(customerEntity.getTotalTrips())
-                .totalSpent(customerEntity.getTotalSpent())
-                .tripPoints(customerEntity.getTripPoints())
+                .fullName(customerEntity.getFullName())
                 .createdAt(customerEntity.getCreatedAt())
                 .createdBy(customerEntity.getCreatedBy())
                 .updatedAt(customerEntity.getUpdatedAt())
                 .updatedBy(customerEntity.getUpdatedBy())
+                .lastBookingAt(customerEntity.getLastBookingAt())
+                .lastTripAt(customerEntity.getLastTripAt())
                 .build();
     }
 }

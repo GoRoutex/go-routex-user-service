@@ -81,7 +81,7 @@ notification:
   email:
     provider: sendgrid
     sendgrid:
-      baseUrl: ${BASE_URL:http://localhost:8000/}
+      baseUrl: ${BASE_URL:http://localhost:5173/}
       api-key: ${SENDGRID_API_KEY}
       from-email: ${SENDGRID_FROM_EMAIL:simon@routex-go.com}
       from-name: ${SENDGRID_FROM_NAME:Go-Routex}
@@ -97,5 +97,7 @@ notification:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.transaction: TRACE
+    org.hibernate.SQL: DEBUG
     org.springframework.kafka: INFO
     org.apache.kafka: WARN

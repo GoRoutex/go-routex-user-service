@@ -16,6 +16,5 @@ public class RegistrationResult {
     private String userId;
     private String email;
     private String phoneNumber;
-    private String userName;
     private String status;
 }
