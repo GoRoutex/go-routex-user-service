@@ -19,17 +19,6 @@
               th:text="${otpCode}">123456</span>
     </div>
 
-    <p>
-        Hoặc bạn có thể xác thực tài khoản bằng cách click vào link bên dưới:
-    </p>
-
-    <p>
-        <a th:href="${verifyLink}"
-           style="padding:12px 20px;background:#1a73e8;color:white;text-decoration:none;border-radius:6px">
-            Verify Account
-        </a>
-    </p>
-
     <p>Mã này sẽ hết hạn sau <strong th:text="${expiredMinutes}">5</strong> phút.</p>
 
     <p>Vui lòng không chia sẻ mã này cho người khác.</p>

@@ -12,11 +12,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerMembershipRepositoryAdapter implements CustomerMembershipRepositoryPort {
 
-    private final CustomerMembershipPersistenceMapper customerMembershipPersistenceMapper;
     private final CustomerMembershipEntityRepository customerMembershipEntityRepository;
 
     @Override
     public Optional<CustomerMembership> findById(String id) {
-        return customerMembershipEntityRepository.findById(id).map(customerMembershipPersistenceMapper::toDomain);
+        return customerMembershipEntityRepository.findById(id).map(CustomerMembershipPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public CustomerMembership save(CustomerMembership customerMembership) {
+        return CustomerMembershipPersistenceMapper.toDomain(customerMembershipEntityRepository.save(CustomerMembershipPersistenceMapper.toJpaEntity(customerMembership)));
     }
 }

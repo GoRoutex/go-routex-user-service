@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import vn.com.routex.hub.user.service.domain.user.model.Gender;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 
 import java.math.BigDecimal;
@@ -20,11 +21,13 @@ import java.util.List;
 public class GetMyProfileResult {
 
     private String userId;
-    private String username;
     private String email;
     private String phone;
-    private String fullName;
     private UserStatus status;
+    private Gender gender;
+    private String avatarUrl;
+    private String address;
+    private String nationalId;
     private Boolean emailVerified;
     private Boolean phoneVerified;
     private OffsetDateTime createdAt;
@@ -40,9 +43,11 @@ public class GetMyProfileResult {
     @AllArgsConstructor
     public static class MyCustomerProfileResult {
         private String customerId;
+        private String fullName;
         private BigDecimal tripPoints;
         private Integer totalTrips;
         private BigDecimal totalSpent;
         private OffsetDateTime lastTripAt;
+        private OffsetDateTime lastBookingAt;
     }
 }

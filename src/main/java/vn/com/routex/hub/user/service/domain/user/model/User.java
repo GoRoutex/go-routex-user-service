@@ -21,20 +21,27 @@ public class User extends AbstractAuditingEntity {
 
     private String id;
 
-    private String username;
-
-    private String fullName;
-
     private String passwordHash;
 
+    private String avatarUrl;
+
+    private String address;
+
     private LocalDate dob;
+
+    private Gender gender;
 
     private String phoneNumber;
 
     private String customerMembershipId;
 
+    private String nationalId;
+
     @Builder.Default
     private Boolean phoneVerified = false;
+
+    @Builder.Default
+    private Boolean profileCompleted = false;
 
     private String email;
 

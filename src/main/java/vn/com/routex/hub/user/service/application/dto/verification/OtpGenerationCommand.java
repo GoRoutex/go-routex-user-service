@@ -19,6 +19,5 @@ public class OtpGenerationCommand {
     private String userId;
     private String phoneNumber;
     private String email;
-    private String fullName;
     private OtpPurpose purpose;
 }

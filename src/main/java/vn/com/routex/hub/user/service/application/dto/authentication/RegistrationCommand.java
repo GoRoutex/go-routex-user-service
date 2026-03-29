@@ -15,13 +15,9 @@ import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
 public class RegistrationCommand {
 
     private RequestContext context;
-    private String username;
-    private String password;
     private String email;
+    private String password;
     private String phoneNumber;
-    private String fullName;
     private String dob;
     private String language;
-    private String tenantId;
-    private String timeZone;
 }

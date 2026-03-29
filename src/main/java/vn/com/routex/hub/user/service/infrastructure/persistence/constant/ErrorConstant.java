@@ -19,6 +19,7 @@ public class ErrorConstant {
     public static final String USER_NOT_FOUND_MESSAGE = "User Profile not found";
     public static final String MEMBERSHIP_NOT_FOUND_MESSAGE = "Membership not found";
     public static final String CUSTOMER_NOT_FOUND_MESSAGE = "Customer profile not found";
+    public static final String PROFILE_COMPLETED_MESSAGE = "Profile completed already";
     public static final String REFRESH_TOKEN_NOT_FOUND_MESSAGE = "Refresh token not found!";
     public static final String CUSTOMER_MEMBERSHIP_NOT_FOUND_MESSAGE = "Customer Membership not found!";
     public static final String REFRESH_TOKEN_EXPIRED_MESSAGE = "Refresh token is expired";

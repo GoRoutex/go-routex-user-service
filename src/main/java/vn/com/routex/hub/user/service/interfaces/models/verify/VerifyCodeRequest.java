@@ -42,14 +42,8 @@ public class VerifyCodeRequest extends BaseRequest {
         @Size(max = 36)
         @Pattern(regexp = UUID_REGEX, message = UUID_MESSAGE)
         private String userId;
-
         @NotNull
         @NotBlank
         private String otpCode;
-
-        private String phoneNumber;
-        @Email
-        private String email;
-        private OtpPurpose purpose;
     }
 }

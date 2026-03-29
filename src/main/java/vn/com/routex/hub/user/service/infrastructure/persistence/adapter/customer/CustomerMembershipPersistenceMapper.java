@@ -1,10 +1,11 @@
 package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.customer;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.customer.model.CustomerMembership;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerMembershipEntity;
 
-@Component
+@UtilityClass
 public class CustomerMembershipPersistenceMapper {
 
     public CustomerMembershipEntity toJpaEntity(CustomerMembership customerMembership) {
@@ -14,8 +15,6 @@ public class CustomerMembershipPersistenceMapper {
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())
-                .totalSpent(customerMembership.getTotalSpent())
-                .totalTrips(customerMembership.getTotalTrips())
                 .promotedAt(customerMembership.getPromotedAt())
                 .status(customerMembership.getStatus())
                 .updatedAt(customerMembership.getUpdatedAt())
@@ -32,8 +31,6 @@ public class CustomerMembershipPersistenceMapper {
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())
-                .totalSpent(customerMembership.getTotalSpent())
-                .totalTrips(customerMembership.getTotalTrips())
                 .promotedAt(customerMembership.getPromotedAt())
                 .status(customerMembership.getStatus())
                 .updatedAt(customerMembership.getUpdatedAt())

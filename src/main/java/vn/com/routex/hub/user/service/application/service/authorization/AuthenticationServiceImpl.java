@@ -2,6 +2,7 @@ package vn.com.routex.hub.user.service.application.service.authorization;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,17 +21,18 @@ import vn.com.routex.hub.user.service.application.dto.authentication.Registratio
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
-import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
-import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationCommand;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationResult;
 import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationCommand;
 import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationResult;
 import vn.com.routex.hub.user.service.application.service.AuthenticationService;
-import vn.com.routex.hub.user.service.application.service.EmailService;
-import vn.com.routex.hub.user.service.application.service.VerificationService;
+import vn.com.routex.hub.user.service.application.service.OtpService;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
+import vn.com.routex.hub.user.service.domain.customer.model.CustomerMembership;
+import vn.com.routex.hub.user.service.domain.customer.model.CustomerMembershipStatus;
 import vn.com.routex.hub.user.service.domain.customer.model.CustomerStatus;
+import vn.com.routex.hub.user.service.domain.customer.port.CustomerMembershipRepositoryPort;
 import vn.com.routex.hub.user.service.domain.customer.port.CustomerRepositoryPort;
+import vn.com.routex.hub.user.service.domain.membership.MembershipTierGroup;
 import vn.com.routex.hub.user.service.domain.otp.model.Otp;
 import vn.com.routex.hub.user.service.domain.otp.model.OtpPurpose;
 import vn.com.routex.hub.user.service.domain.otp.model.OtpStatus;
@@ -47,12 +49,15 @@ import vn.com.routex.hub.user.service.domain.token.port.RefreshTokenRepositoryPo
 import vn.com.routex.hub.user.service.domain.user.model.User;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 import vn.com.routex.hub.user.service.domain.user.port.UserRepositoryPort;
+import vn.com.routex.hub.user.service.infrastructure.kafka.event.OtpMailEvent;
+import vn.com.routex.hub.user.service.infrastructure.kafka.event.UserEvent;
 import vn.com.routex.hub.user.service.infrastructure.persistence.constant.BusinessConstant;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jwt.JwtService;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -82,7 +87,6 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_EXPIRED_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.ROLE_NOT_FOUND_ERROR;
-import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USERNAME_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_NOT_ACTIVE_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_NOT_FOUND_MESSAGE;
@@ -93,17 +97,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
     private final JwtService jwtService;
+    private final OtpService otpService;
     private final UserRepositoryPort userRepositoryPort;
-    private final VerificationService verificationService;
     private final CustomerRepositoryPort customerRepositoryPort;
     private final OtpRepositoryPort otpRepositoryPort;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
     private final RefreshTokenRepositoryPort refreshTokenRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
     private final UserRoleRepositoryPort userRoleRepositoryPort;
     private final UserAuthorizationService userAuthorizationService;
-
+    private final CustomerMembershipRepositoryPort customerMembershipRepositoryPort;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
@@ -115,13 +119,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (optUser.isPresent()) {
             User existingUser = optUser.get();
             if (UserStatus.VERIFYING.equals(existingUser.getStatus())) {
-                generateOtpAndSendMail(context, existingUser, OtpPurpose.REGISTER_VERIFY);
+                applicationEventPublisher.publishEvent(
+                        OtpMailEvent.builder()
+                                .context(context)
+                                .userEvent(UserEvent.builder()
+                                        .userId(existingUser.getId())
+                                        .email(existingUser.getEmail())
+                                        .phoneNumber(existingUser.getPhoneNumber())
+                                        .build())
+                                .purpose(OtpPurpose.REGISTER_VERIFY)
+                                .build()
+                );
             }
             throw BusinessException(context, DUPLICATE_ERROR, USER_EXISTS);
-        }
-
-        if (userRepositoryPort.existsByUsername(command.getUsername())) {
-            throw BusinessException(context, DUPLICATE_ERROR, USERNAME_EXISTS);
         }
 
         if (userRepositoryPort.existsByPhoneNumber(command.getPhoneNumber())) {
@@ -131,8 +141,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String userId = UUID.randomUUID().toString();
         User registeredUser = User.builder()
                 .id(userId)
-                .username(command.getUsername())
-                .fullName(command.getFullName())
                 .passwordHash(passwordEncoder.encode(command.getPassword()))
                 .dob(LocalDate.parse(command.getDob()))
                 .phoneNumber(command.getPhoneNumber())
@@ -141,9 +149,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .emailVerified(Boolean.FALSE)
                 .status(UserStatus.VERIFYING)
                 .createdAt(OffsetDateTime.now())
-                .tenantId(command.getTenantId())
                 .language(command.getLanguage())
-                .timezone(command.getTimeZone())
                 .build();
 
         Customer customer = Customer.builder()
@@ -152,8 +158,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .status(CustomerStatus.ACTIVE)
                 .build();
 
-        customerRepositoryPort.save(customer);
+        CustomerMembership customerMembership = CustomerMembership.builder()
+                .id(UUID.randomUUID().toString())
+                .customerId(customer.getId())
+                .membershipTierId(MembershipTierGroup.BRONZE.getId())
+                .currentAvailablePoints(BigDecimal.ZERO)
+                .totalPoints(BigDecimal.ZERO)
+                .promotedAt(OffsetDateTime.now())
+                .status(CustomerMembershipStatus.ACTIVE)
+                .build();
+
         userRepositoryPort.save(registeredUser);
+        customerRepositoryPort.save(customer);
+        customerMembershipRepositoryPort.save(customerMembership);
+
 
         Roles customerRole = roleRepositoryPort.findByCode(RolesList.CUSTOMER.name())
                 .orElseThrow(() -> BusinessException(
@@ -171,13 +189,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
         userRoleRepositoryPort.save(userRoles);
 
-        generateOtpAndSendMail(context, registeredUser, OtpPurpose.REGISTER_VERIFY);
+
+        sLog.info("[PUBLISHING-EVENT]  Event publishing .... ");
+
+        // Publish event for sending email
+        applicationEventPublisher.publishEvent(
+                OtpMailEvent.builder()
+                        .context(context)
+                        .userEvent(UserEvent.builder()
+                                .userId(registeredUser.getId())
+                                .email(registeredUser.getEmail())
+                                .phoneNumber(registeredUser.getPhoneNumber())
+                                .build())
+                        .purpose(OtpPurpose.REGISTER_VERIFY)
+                        .build()
+        );
 
         return RegistrationResult.builder()
                 .userId(registeredUser.getId())
                 .email(command.getEmail())
                 .phoneNumber(command.getPhoneNumber())
-                .userName(command.getUsername())
                 .status(UserStatus.VERIFYING.name())
                 .build();
     }
@@ -200,7 +231,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if (otp.getAttemptCount() >= MAX_ATTEMPTS_OTP) {
                 otp.setStatus(OtpStatus.REVOKED);
                 otpRepositoryPort.save(otp);
-                generateOtpAndSendMail(context, user, OtpPurpose.REGISTER_VERIFY);
+                applicationEventPublisher.publishEvent(
+                        OtpMailEvent.builder()
+                                .context(context)
+                                .userEvent(UserEvent.builder()
+                                        .userId(user.getId())
+                                        .email(user.getEmail())
+                                        .phoneNumber(user.getPhoneNumber())
+                                        .build())
+                                .purpose(OtpPurpose.REGISTER_VERIFY)
+                                .build()
+                );
                 throw BusinessException(context, OTP_COOL_DOWN, OTP_FAIL_ATTEMPTS);
             }
 
@@ -233,7 +274,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public LoginResult login(LoginCommand command) {
         RequestContext context = command.getContext();
-        User user = userRepositoryPort.findByUsername(command.getUsername())
+        User user = userRepositoryPort.findByEmail(command.getEmail())
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
         if (!passwordEncoder.matches(command.getPassword(), user.getPasswordHash())) {
@@ -262,13 +303,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .updatedAt(now)
                 .build());
 
+        user.setLastLoginAt(OffsetDateTime.now());
+        userRepositoryPort.save(user);
+
         return LoginResult.builder()
                 .userId(user.getId())
-                .username(user.getUsername())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .roles(roles)
                 .authorities(authorities)
+                .profileCompleted(user.getProfileCompleted())
                 .build();
     }
 
@@ -279,7 +323,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String username = authentication.getName();
         RequestContext context = command.getContext();
 
-        User user = userRepositoryPort.findByUsername(username)
+        User user = userRepositoryPort.findByEmail(username)
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
         if (!passwordEncoder.matches(command.getOldPassword(), user.getPasswordHash())) {
@@ -314,10 +358,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public ForgotPasswordResult forgotPassword(ForgotPasswordCommand command) {
         RequestContext context = command.getContext();
-        User user = userRepositoryPort.findByUsernameAndEmail(command.getUsername(), command.getEmail())
+        User user = userRepositoryPort.findByEmail(command.getEmail())
                 .orElseThrow(() -> BusinessException(context, INVALID_INPUT_ERROR, INVALID_USERNAME_EMAIL_MESSAGE));
 
-        generateOtpAndSendMail(context, user, OtpPurpose.FORGOT_PASSWORD);
+        applicationEventPublisher.publishEvent(
+                OtpMailEvent.builder()
+                        .context(context)
+                        .userEvent(UserEvent.builder()
+                                .userId(user.getId())
+                                .email(user.getEmail())
+                                .phoneNumber(user.getPhoneNumber())
+                                .build())
+                        .purpose(OtpPurpose.FORGOT_PASSWORD)
+                        .build()
+        );
 
         return ForgotPasswordResult.builder()
                 .userId(user.getId())
@@ -414,7 +468,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepositoryPort.findByEmail(command.getEmail())
                 .orElseThrow(() -> BusinessException(command.getContext(), RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
-        OtpGenerationResult result = generateOtpAndSendMail(command.getContext(), user, command.getOtpPurpose());
+        OtpGenerationResult result = otpService.generateOtpAndSendMail(
+                command.getContext(), UserEvent.builder().userId(user.getId()).email(user.getEmail())
+                        .phoneNumber(user.getPhoneNumber()).build(), command.getOtpPurpose());
 
         OffsetDateTime expiredAt = result.getExpiredAt();
 
@@ -425,27 +481,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .retryAfterSeconds(RESEND_COOLDOWN_SECONDS)
                 .build();
 
-    }
-
-    private OtpGenerationResult generateOtpAndSendMail(RequestContext context, User user, OtpPurpose otpPurpose) {
-        OtpGenerationResult otpResult = verificationService.createClientOtp(OtpGenerationCommand.builder()
-                .context(context)
-                .userId(user.getId())
-                .email(user.getEmail())
-                .phoneNumber(user.getPhoneNumber())
-                .fullName(user.getFullName())
-                .purpose(otpPurpose)
-                .build());
-
-        emailService.sendEmail(EmailMessageCommand.builder()
-                .toEmail(otpResult.getEmail())
-                .userId(otpResult.getUserId())
-                .fullName(otpResult.getFullName())
-                .verificationCode(otpResult.getPlainOtp())
-                .expireMinutes(otpResult.getExpiresMinutes())
-                .build());
-
-        return otpResult;
     }
 
     private BusinessException BusinessException(RequestContext context, String code, String description) {

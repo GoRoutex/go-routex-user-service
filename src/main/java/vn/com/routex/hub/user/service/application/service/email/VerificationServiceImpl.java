@@ -3,6 +3,8 @@ package vn.com.routex.hub.user.service.application.service.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationCommand;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationResult;
 import vn.com.routex.hub.user.service.application.service.VerificationService;
@@ -10,6 +12,7 @@ import vn.com.routex.hub.user.service.domain.otp.model.Otp;
 import vn.com.routex.hub.user.service.domain.otp.model.OtpStatus;
 import vn.com.routex.hub.user.service.domain.otp.port.OtpRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
+import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 
 import java.security.SecureRandom;
@@ -31,8 +34,10 @@ public class VerificationServiceImpl implements VerificationService {
     private final OtpRepositoryPort otpRepositoryPort;
     private final PasswordEncoder passwordEncoder;
     private final SecureRandom secureRandom = new SecureRandom();
+    private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OtpGenerationResult createClientOtp(OtpGenerationCommand command) {
         otpRepositoryPort.findLatestActiveOtp(command.getUserId(), command.getPurpose())
             .ifPresent(existing -> {
@@ -58,7 +63,6 @@ public class VerificationServiceImpl implements VerificationService {
         Otp otp = Otp.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(command.getUserId())
-                .fullName(command.getFullName())
                 .phoneNumber(command.getPhoneNumber())
                 .email(command.getEmail())
                 .purpose(command.getPurpose())
@@ -70,13 +74,16 @@ public class VerificationServiceImpl implements VerificationService {
                 .createdAt(OffsetDateTime.now())
                 .build();
 
+        sLog.info("OTP Created: {}", otp);
+
         otpRepositoryPort.save(otp);
+
+        sLog.info("OTP Saved");
 
         long expiresMinutes = ChronoUnit.MINUTES.between(OffsetDateTime.now(), otp.getExpiredAt());
         return OtpGenerationResult.builder()
                 .plainOtp(plainOtp)
                 .userId(command.getUserId())
-                .fullName(command.getFullName())
                 .email(command.getEmail())
                 .expiredAt(otp.getExpiredAt())
                 .expiresMinutes(expiresMinutes)

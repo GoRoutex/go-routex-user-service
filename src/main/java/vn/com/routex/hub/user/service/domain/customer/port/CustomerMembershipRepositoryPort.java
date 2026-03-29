@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface CustomerMembershipRepositoryPort {
     Optional<CustomerMembership> findById(String id);
+
+    CustomerMembership save(CustomerMembership customerMembership);
 }

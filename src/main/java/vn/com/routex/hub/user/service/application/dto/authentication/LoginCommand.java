@@ -15,6 +15,6 @@ import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
 public class LoginCommand {
 
     private RequestContext context;
-    private String username;
+    private String email;
     private String password;
 }

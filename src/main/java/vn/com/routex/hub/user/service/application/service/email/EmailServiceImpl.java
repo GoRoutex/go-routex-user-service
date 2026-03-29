@@ -63,14 +63,10 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private @NonNull Map<String, Object> getStringObjectMap(EmailMessageCommand command) {
-        String verifyLink =
-                properties.getBaseUrl() + "/api/v1/user-service/authentication/verify/" + command.getUserId();
-
         Map<String, Object> variables = new HashMap<>();
         variables.put("fullName", (command.getFullName() == null || command.getFullName().isBlank()) ? "bạn" : command.getFullName());
         variables.put("otpCode", command.getVerificationCode());
         variables.put("expiredMinutes", command.getExpireMinutes());
-        variables.put("verifyLink", verifyLink);
         return variables;
     }
 }

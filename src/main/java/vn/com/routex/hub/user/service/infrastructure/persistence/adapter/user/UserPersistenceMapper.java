@@ -2,20 +2,22 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.user;
 
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.user.model.User;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.entity.UserJpaEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.entity.UserEntity;
 
 @Component
 public class UserPersistenceMapper {
 
-    public UserJpaEntity toJpaEntity(User user) {
-        return UserJpaEntity.builder()
+    public UserEntity toJpaEntity(User user) {
+        return UserEntity.builder()
                 .id(user.getId())
-                .username(user.getUsername())
-                .fullName(user.getFullName())
                 .passwordHash(user.getPasswordHash())
                 .dob(user.getDob())
                 .phoneNumber(user.getPhoneNumber())
                 .phoneVerified(user.getPhoneVerified())
+                .nationalId(user.getNationalId())
+                .address(user.getAddress())
+                .avatarUrl(user.getAvatarUrl())
+                .gender(user.getGender())
                 .email(user.getEmail())
                 .emailVerified(user.getEmailVerified())
                 .status(user.getStatus())
@@ -29,31 +31,35 @@ public class UserPersistenceMapper {
                 .createdBy(user.getCreatedBy())
                 .updatedAt(user.getUpdatedAt())
                 .updatedBy(user.getUpdatedBy())
+                .profileCompleted(user.getProfileCompleted())
                 .build();
     }
 
-    public User toDomain(UserJpaEntity userJpaEntity) {
+    public User toDomain(UserEntity userEntity) {
         return User.builder()
-                .id(userJpaEntity.getId())
-                .username(userJpaEntity.getUsername())
-                .fullName(userJpaEntity.getFullName())
-                .passwordHash(userJpaEntity.getPasswordHash())
-                .dob(userJpaEntity.getDob())
-                .phoneNumber(userJpaEntity.getPhoneNumber())
-                .phoneVerified(userJpaEntity.getPhoneVerified())
-                .email(userJpaEntity.getEmail())
-                .emailVerified(userJpaEntity.getEmailVerified())
-                .status(userJpaEntity.getStatus())
-                .tenantId(userJpaEntity.getTenantId())
-                .language(userJpaEntity.getLanguage())
-                .timezone(userJpaEntity.getTimezone())
-                .failLoginCount(userJpaEntity.getFailLoginCount())
-                .lastLoginAt(userJpaEntity.getLastLoginAt())
-                .lockedUntil(userJpaEntity.getLockedUntil())
-                .createdAt(userJpaEntity.getCreatedAt())
-                .createdBy(userJpaEntity.getCreatedBy())
-                .updatedAt(userJpaEntity.getUpdatedAt())
-                .updatedBy(userJpaEntity.getUpdatedBy())
+                .id(userEntity.getId())
+                .passwordHash(userEntity.getPasswordHash())
+                .dob(userEntity.getDob())
+                .phoneNumber(userEntity.getPhoneNumber())
+                .phoneVerified(userEntity.getPhoneVerified())
+                .nationalId(userEntity.getNationalId())
+                .address(userEntity.getAddress())
+                .avatarUrl(userEntity.getAvatarUrl())
+                .gender(userEntity.getGender())
+                .email(userEntity.getEmail())
+                .emailVerified(userEntity.getEmailVerified())
+                .status(userEntity.getStatus())
+                .tenantId(userEntity.getTenantId())
+                .language(userEntity.getLanguage())
+                .timezone(userEntity.getTimezone())
+                .failLoginCount(userEntity.getFailLoginCount())
+                .lastLoginAt(userEntity.getLastLoginAt())
+                .lockedUntil(userEntity.getLockedUntil())
+                .createdAt(userEntity.getCreatedAt())
+                .createdBy(userEntity.getCreatedBy())
+                .updatedAt(userEntity.getUpdatedAt())
+                .updatedBy(userEntity.getUpdatedBy())
+                .profileCompleted(userEntity.getProfileCompleted())
                 .build();
     }
 }

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import vn.com.routex.hub.user.service.domain.user.model.Gender;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.shared.entity.AbstractAuditingJpaEntity;
 
@@ -25,16 +26,10 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class UserJpaEntity extends AbstractAuditingJpaEntity {
+public class UserEntity extends AbstractAuditingJpaEntity {
 
     @Id
     private String id;
-
-    @Column(name = "USER_NAME", nullable = false)
-    private String username;
-
-    @Column(name = "FULL_NAME", nullable = false)
-    private String fullName;
 
     @Column(name = "CUSTOMER_MEMBERSHIP_ID")
     private String customerMembershipId;
@@ -51,6 +46,23 @@ public class UserJpaEntity extends AbstractAuditingJpaEntity {
     @Builder.Default
     @Column(name = "PHONE_VERIFIED")
     private Boolean phoneVerified = false;
+
+    @Column(name = "NATIONAL_ID")
+    private String nationalId;
+
+    @Column(name = "ADDRESS")
+    private String address;
+
+    @Column(name = "AVATAR_URL")
+    private String avatarUrl;
+
+    @Column(name = "GENDER")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Builder.Default
+    @Column(name = "PROFILE_COMPLETED")
+    private Boolean profileCompleted = false;
 
     @Column(name = "EMAIL", nullable = false)
     private String email;
