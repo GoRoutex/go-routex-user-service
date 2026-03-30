@@ -12,6 +12,7 @@ public interface SpringDataCustomerRepository extends JpaRepository<UserEntity, 
         SELECT u.id as userId,
                c.totalTrips as totalTrips,
                c.totalSpent as totalSpent,
+               c.tripPoints as tripPoints,
                t.id as currentTierId,
                t.badge as currentBadge,
                t.priorityLevel as priorityLevel,
@@ -19,7 +20,7 @@ public interface SpringDataCustomerRepository extends JpaRepository<UserEntity, 
                t.discountPercent as discountPercent
         FROM UserEntity u
         JOIN CustomerEntity c ON u.id = c.userId
-        JOIN CustomerMembershipEntity cm ON u.customerMembershipId = cm.id
+        JOIN CustomerMembershipEntity cm ON c.id = cm.customerId
         JOIN MembershipTierEntity t ON cm.membershipTierId = t.id
         WHERE u.id = :userId
     """)

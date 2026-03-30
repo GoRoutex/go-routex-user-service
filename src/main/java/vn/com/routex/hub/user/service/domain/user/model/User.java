@@ -33,8 +33,6 @@ public class User extends AbstractAuditingEntity {
 
     private String phoneNumber;
 
-    private String customerMembershipId;
-
     private String nationalId;
 
     @Builder.Default

@@ -1,6 +1,7 @@
 package vn.com.routex.hub.user.service.application.dto.profile;
 
 import lombok.Builder;
+import vn.com.routex.hub.user.service.domain.membership.model.MembershipBadge;
 import vn.com.routex.hub.user.service.domain.user.model.Gender;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 
@@ -23,6 +24,8 @@ public record GetMyProfileResult(
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt,
         List<String> authorities,
+        MyMembershipResult membership,
+        MyMembershipStats stats,
         MyCustomerProfileResult customer
 ) {
     @Builder
@@ -35,6 +38,25 @@ public record GetMyProfileResult(
             OffsetDateTime lastTripAt,
             OffsetDateTime lastBookingAt
     ) {
+    }
+
+    @Builder
+    public record MyMembershipResult(
+            BigDecimal currentPoint,
+            Integer discountPercent,
+            Integer priorityLevel
+    ) {}
+
+    @Builder
+    public record MyMembershipStats(
+            Integer totalTrips,
+            String badge,
+            BigDecimal totalSpent,
+            BigDecimal pointToNextTier,
+            BigDecimal pointMultiplier,
+            MembershipBadge nextTierName
+    ) {
+
     }
 }
 

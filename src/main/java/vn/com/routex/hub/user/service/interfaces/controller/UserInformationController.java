@@ -21,14 +21,21 @@ import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileComman
 import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileResult;
 import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileCommand;
 import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileResult;
+import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileCommand;
+import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileResult;
 import vn.com.routex.hub.user.service.application.service.UserProfileService;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 import vn.com.routex.hub.user.service.interfaces.models.profile.CompleteProfileRequest;
 import vn.com.routex.hub.user.service.interfaces.models.profile.CompleteProfileResponse;
 import vn.com.routex.hub.user.service.interfaces.models.profile.GetMyProfileResponse;
+import vn.com.routex.hub.user.service.interfaces.models.profile.GetMyProfileResponse.GetMyMembershipResponseData;
+import vn.com.routex.hub.user.service.interfaces.models.profile.GetMyProfileResponse.GetMyMembershipStats;
 import vn.com.routex.hub.user.service.interfaces.models.profile.GetUserProfileRequest;
 import vn.com.routex.hub.user.service.interfaces.models.profile.GetUserProfileResponse;
+import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileRequest;
+import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileResponse;
+import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileResponse.UpdateProfileResponseData;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
 
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.API_PATH;
@@ -36,6 +43,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.COMPLETE_PROFILE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.ME_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.PROFILE_PATH;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.UPDATE_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.USER_SERVICE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_CODE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_MESSAGE;
@@ -61,6 +69,21 @@ public class UserInformationController {
                 .userId(userId)
                 .build());
 
+        GetMyMembershipResponseData myMembership = GetMyMembershipResponseData.builder()
+                .currentPoint(result.membership().currentPoint())
+                .discountPercent(result.membership().discountPercent())
+                .priorityLevel(result.membership().priorityLevel())
+                .build();
+
+        GetMyMembershipStats myStats = GetMyMembershipStats.builder()
+                .totalTrips(result.stats().totalTrips())
+                .badge(result.stats().badge())
+                .totalSpent(result.stats().totalSpent())
+                .pointToNextTier(result.stats().pointToNextTier())
+                .pointMultiplier(result.stats().pointMultiplier())
+                .nextTierName(result.stats().nextTierName())
+                .build();
+
         GetMyProfileResponse.MyCustomerProfile myProfile = GetMyProfileResponse.MyCustomerProfile.builder()
                 .customerId(result.customer().customerId())
                 .fullName(result.customer().fullName())
@@ -72,10 +95,10 @@ public class UserInformationController {
                 .build();
 
         return ResponseEntity.ok(GetMyProfileResponse.builder()
-                        .result(ApiResult.builder()
-                                .responseCode(SUCCESS_CODE)
-                                .description(SUCCESS_MESSAGE)
-                                .build())
+                .result(ApiResult.builder()
+                        .responseCode(SUCCESS_CODE)
+                        .description(SUCCESS_MESSAGE)
+                        .build())
                 .data(GetMyProfileResponse.GetMyProfileResponseData
                         .builder()
                         .userId(result.userId())
@@ -93,6 +116,8 @@ public class UserInformationController {
                         .authorities(result.authorities())
                         .customer(myProfile)
                         .build())
+                .membership(myMembership)
+                .stats(myStats)
                 .build());
     }
 
@@ -100,9 +125,9 @@ public class UserInformationController {
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('profile:view')")
     public ResponseEntity<GetUserProfileResponse> getProfiles(@Valid @RequestBody GetUserProfileRequest request) {
         GetUserProfileResult result = userProfileService.getUserProfile(GetUserProfileCommand.builder()
-                        .context(toContext(request))
-                        .userId(request.getData().getUserId())
-                        .build());
+                .context(toContext(request))
+                .userId(request.getData().getUserId())
+                .build());
 
 
         return ResponseEntity.ok(GetUserProfileResponse.builder()
@@ -129,6 +154,40 @@ public class UserInformationController {
                 .build());
     }
 
+
+    @PostMapping(PROFILE_PATH + UPDATE_PATH)
+    public ResponseEntity<UpdateProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
+
+
+        sLog.info("[UPDATE-PROFILE] Update Profile Request: {}", request);
+        UpdateProfileResult result = userProfileService.updateProfile(
+                UpdateProfileCommand.builder()
+                        .context(toContext(request))
+                        .userId(request.getUserId())
+                        .fullName(request.getData().getFullName())
+                        .email(request.getData().getEmail())
+                        .phoneNumber(request.getData().getPhoneNumber())
+                        .address(request.getData().getAddress()).build());
+
+        UpdateProfileResponse response = UpdateProfileResponse.builder()
+                .requestId(request.getRequestId())
+                .requestDateTime(request.getRequestDateTime())
+                .channel(request.getChannel())
+                .result(ApiResult.builder()
+                        .responseCode(SUCCESS_CODE)
+                        .description(SUCCESS_MESSAGE)
+                        .build())
+                .data(UpdateProfileResponseData.builder()
+                        .userId(result.userId())
+                        .fullName(result.fullName())
+                        .address(result.address())
+                        .email(result.email())
+                        .phoneNumber(result.phoneNumber()).build())
+                .build();
+
+        sLog.info("[UPDATE-PROFILE] Update Profile Response: {}", response);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping(PROFILE_PATH + COMPLETE_PROFILE)
     public ResponseEntity<CompleteProfileResponse> completeProfile(@Valid @RequestBody CompleteProfileRequest request) {
