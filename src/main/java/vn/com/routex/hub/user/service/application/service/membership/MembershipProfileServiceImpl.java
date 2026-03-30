@@ -32,7 +32,7 @@ public class MembershipProfileServiceImpl implements MembershipProfileService {
     @Transactional(readOnly = true)
     public GetMyMembershipResult getMyMembership(GetMyMembershipCommand command) {
 
-        CustomerMembershipView customerMemberShipView = customerMembershipQueryRepository.findMembershipSummaryByUserId(command.getUserId())
+        CustomerMembershipView customerMemberShipView = customerMembershipQueryRepository.findMembershipSummaryByUserId(command.userId())
                 .orElseThrow(() -> new BusinessException(ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, SPRING_DATA_NOT_FOUND_MESSAGE)));
 
         Optional<MembershipTier> nextTierOpt = membershipTierRepositoryPort.findByPriorityLevel(customerMemberShipView.priorityLevel() + 1);
@@ -43,7 +43,7 @@ public class MembershipProfileServiceImpl implements MembershipProfileService {
 
         return GetMyMembershipResult
                 .builder()
-                .userId(command.getUserId())
+                .userId(command.userId())
                 .currentPoint(customerMemberShipView.tripPoints())
                 .benefit(GetMyMembershipResult.MyMembershipBenefitResult.builder()
                         .badge(customerMemberShipView.currentBadge())

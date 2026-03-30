@@ -47,10 +47,10 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(readOnly = true)
     public GetUserProfileResult getUserProfile(GetUserProfileCommand command) {
 
-        RequestContext context = command.getContext();
-        String userId = command.getUserId();
+        RequestContext context = command.context();
+        String userId = command.userId();
         User user = userRepositoryPort.findById(userId)
-                .orElseThrow(() -> new BusinessException(context.getRequestId(), context.getRequestDateTime(), context.getChannel(),
+                .orElseThrow(() -> new BusinessException(context.requestId(), context.requestDateTime(), context.channel(),
                         ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE)));
 
         Customer customer = customerRepositoryPort.findByUserId(user.getId())
@@ -84,14 +84,14 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(readOnly = true)
     public GetMyProfileResult getMyProfile(GetMyProfileCommand command) {
 
-        String userId = command.getUserId();
+        String userId = command.userId();
 
-        User user = userRepositoryPort.findById(command.getUserId())
+        User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> new BusinessException(ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE)));
 
-        Customer customer = customerRepositoryPort.findByUserId(command.getUserId()).orElse(null);
+        Customer customer = customerRepositoryPort.findByUserId(command.userId()).orElse(null);
 
-        List<String> authorities = new ArrayList<>(userAuthorizationService.getAuthorities(command.getUserId()));
+        List<String> authorities = new ArrayList<>(userAuthorizationService.getAuthorities(command.userId()));
 
         MyCustomerProfileResult myCustomer = customer != null ?
                 MyCustomerProfileResult
@@ -129,28 +129,28 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional
     public CompleteProfileResult completeProfile(CompleteProfileCommand command) {
-        User user = userRepositoryPort.findById(command.getUserId())
-                .orElseThrow(() -> new BusinessException(command.getContext().getRequestId(), command.getContext().getRequestDateTime(), command.getContext().getChannel(),
+        User user = userRepositoryPort.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
                         ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, RECORD_NOT_FOUND_MESSAGE)));
 
         Customer customer = customerRepositoryPort.findByUserId(user.getId())
-                .orElseThrow(() -> new BusinessException(command.getContext().getRequestId(), command.getContext().getRequestDateTime(), command.getContext().getChannel(),
+                .orElseThrow(() -> new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
                         ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, CUSTOMER_NOT_FOUND_MESSAGE)));
 
         if(user.getProfileCompleted()) {
-            throw new BusinessException(command.getContext().getRequestId(), command.getContext().getRequestDateTime(), command.getContext().getChannel(),
+            throw new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
                     ExceptionUtils.buildResultResponse(DUPLICATE_ERROR, PROFILE_COMPLETED_MESSAGE));
         }
 
         sLog.info("User before saved: {}", user);
         sLog.info("Customer before saved: {}", customer);
 
-        user.setNationalId(command.getNationalId());
-        user.setAddress(command.getAddress());
-        user.setGender(Gender.valueOf(command.getGender()));
-        user.setAvatarUrl(command.getAvatarUrl());
+        user.setNationalId(command.nationalId());
+        user.setAddress(command.address());
+        user.setGender(Gender.valueOf(command.gender()));
+        user.setAvatarUrl(command.avatarUrl());
         user.setProfileCompleted(true);
-        customer.setFullName(command.getFullName());
+        customer.setFullName(command.fullName());
 
         userRepositoryPort.save(user);
         customerRepositoryPort.save(customer);
@@ -158,15 +158,15 @@ public class UserProfileServiceImpl implements UserProfileService {
         sLog.info("User after saved: {}", user);
         sLog.info("Customer after saved: {}", customer);
 
-        sLog.info("[COMPLETE-PROFILE] Profile completed with userId: {}", command.getUserId());
+        sLog.info("[COMPLETE-PROFILE] Profile completed with userId: {}", command.userId());
 
 
         return CompleteProfileResult.builder()
-                .userId(command.getUserId())
-                .fullName(command.getFullName())
-                .address(command.getAddress())
-                .avatarUrl(command.getAvatarUrl())
-                .gender(command.getGender())
+                .userId(command.userId())
+                .fullName(command.fullName())
+                .address(command.address())
+                .avatarUrl(command.avatarUrl())
+                .gender(command.gender())
                 .profileCompleted(true)
                 .build();
     }

@@ -18,6 +18,8 @@ import vn.com.routex.hub.user.service.application.dto.authentication.RefreshToke
 import vn.com.routex.hub.user.service.application.dto.authentication.RefreshTokenResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationResult;
+import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordCommand;
+import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
@@ -81,6 +83,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_EXPIRED;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_FAIL_ATTEMPTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_NOT_ACTIVE;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.OTP_NOT_FOUND_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.PHONE_NUMBER_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.RECORD_NOT_FOUND;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.RECORD_NOT_FOUND_MESSAGE;
@@ -113,9 +116,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public RegistrationResult registerUser(RegistrationCommand command) {
         sLog.info("[REGISTER] Request: {}", command);
-        RequestContext context = command.getContext();
+        RequestContext context = command.context();
 
-        Optional<User> optUser = userRepositoryPort.findByEmail(command.getEmail());
+        Optional<User> optUser = userRepositoryPort.findByEmail(command.email());
         if (optUser.isPresent()) {
             User existingUser = optUser.get();
             if (UserStatus.VERIFYING.equals(existingUser.getStatus())) {
@@ -134,22 +137,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw BusinessException(context, DUPLICATE_ERROR, USER_EXISTS);
         }
 
-        if (userRepositoryPort.existsByPhoneNumber(command.getPhoneNumber())) {
+        if (userRepositoryPort.existsByPhoneNumber(command.phoneNumber())) {
             throw BusinessException(context, DUPLICATE_ERROR, PHONE_NUMBER_EXISTS);
         }
 
         String userId = UUID.randomUUID().toString();
         User registeredUser = User.builder()
                 .id(userId)
-                .passwordHash(passwordEncoder.encode(command.getPassword()))
-                .dob(LocalDate.parse(command.getDob()))
-                .phoneNumber(command.getPhoneNumber())
+                .passwordHash(passwordEncoder.encode(command.password()))
+                .dob(LocalDate.parse(command.dob()))
+                .phoneNumber(command.phoneNumber())
                 .phoneVerified(Boolean.FALSE)
-                .email(command.getEmail())
+                .email(command.email())
                 .emailVerified(Boolean.FALSE)
                 .status(UserStatus.VERIFYING)
                 .createdAt(OffsetDateTime.now())
-                .language(command.getLanguage())
+                .language(command.language())
                 .build();
 
         Customer customer = Customer.builder()
@@ -207,8 +210,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return RegistrationResult.builder()
                 .userId(registeredUser.getId())
-                .email(command.getEmail())
-                .phoneNumber(command.getPhoneNumber())
+                .email(command.email())
+                .phoneNumber(command.phoneNumber())
                 .status(UserStatus.VERIFYING.name())
                 .build();
     }
@@ -216,15 +219,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public VerifyOtpResult verifyOtpUser(VerifyOtpCommand command) {
         sLog.info("[VERIFICATION] Verification Request: {}", command);
-        RequestContext context = command.getContext();
+        RequestContext context = command.context();
 
-        Otp otp = otpRepositoryPort.findByUserId(command.getUserId())
+        Otp otp = otpRepositoryPort.findByUserId(command.userId())
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, RECORD_NOT_FOUND_MESSAGE));
 
-        User user = userRepositoryPort.findById(command.getUserId())
+        User user = userRepositoryPort.findById(command.userId())
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
-        if (!passwordEncoder.matches(command.getOtpCode(), otp.getOtpHash())) {
+        if (!passwordEncoder.matches(command.otpCode(), otp.getOtpHash())) {
             otp.setAttemptCount(otp.getAttemptCount() + 1);
             otpRepositoryPort.save(otp);
 
@@ -261,23 +264,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         otp.setUpdatedAt(OffsetDateTime.now());
         user.setStatus(UserStatus.ACTIVE);
         user.setUpdatedAt(OffsetDateTime.now());
+        user.setEmailVerified(true);
         otpRepositoryPort.save(otp);
         userRepositoryPort.save(user);
 
         return VerifyOtpResult.builder()
-                .otpCode(command.getOtpCode())
+                .otpCode(command.otpCode())
                 .status(UserStatus.ACTIVE.name())
-                .userId(command.getUserId())
+                .userId(command.userId())
                 .build();
     }
 
     @Override
     public LoginResult login(LoginCommand command) {
-        RequestContext context = command.getContext();
-        User user = userRepositoryPort.findByEmail(command.getEmail())
+        RequestContext context = command.context();
+        User user = userRepositoryPort.findByEmail(command.email())
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
-        if (!passwordEncoder.matches(command.getPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(command.password(), user.getPasswordHash())) {
             throw BusinessException(context, INVALID_INPUT_ERROR, INVALID_USERNAME_OR_PASSWORD_MESSAGE);
         }
 
@@ -321,24 +325,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public ChangePasswordResult changePassword(ChangePasswordCommand command) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        RequestContext context = command.getContext();
+        RequestContext context = command.context();
 
         User user = userRepositoryPort.findByEmail(username)
                 .orElseThrow(() -> BusinessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
-        if (!passwordEncoder.matches(command.getOldPassword(), user.getPasswordHash())) {
+        if (!passwordEncoder.matches(command.oldPassword(), user.getPasswordHash())) {
             throw BusinessException(context, INVALID_INPUT_ERROR, INVALID_PASSWORD);
         }
 
-        if (command.getNewPassword().equals(command.getOldPassword())) {
+        if (command.newPassword().equals(command.oldPassword())) {
             throw BusinessException(context, INVALID_INPUT_ERROR, INVALID_NEW_PASSWORD);
         }
 
-        if (!command.getNewPassword().equals(command.getConfirmNewPassword())) {
+        if (!command.newPassword().equals(command.confirmNewPassword())) {
             throw BusinessException(context, INVALID_INPUT_ERROR, CONFIRM_PASSWORD_NOT_MATCHED);
         }
 
-        user.setPasswordHash(passwordEncoder.encode(command.getNewPassword()));
+        user.setPasswordHash(passwordEncoder.encode(command.newPassword()));
         user.setUpdatedAt(OffsetDateTime.now());
         userRepositoryPort.save(user);
 
@@ -356,9 +360,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public ForgotPasswordResult forgotPassword(ForgotPasswordCommand command) {
-        RequestContext context = command.getContext();
-        User user = userRepositoryPort.findByEmail(command.getEmail())
+        RequestContext context = command.context();
+        User user = userRepositoryPort.findByEmail(command.email())
                 .orElseThrow(() -> BusinessException(context, INVALID_INPUT_ERROR, INVALID_USERNAME_EMAIL_MESSAGE));
 
         applicationEventPublisher.publishEvent(
@@ -373,6 +378,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build()
         );
 
+        sLog.info("[FORGOT-PASSWORD] Event published successfully with RequestId: {}", command.context().requestId());
+
         return ForgotPasswordResult.builder()
                 .userId(user.getId())
                 .expiresMinutes(BusinessConstant.EXPIRED_OTP_MINUTES)
@@ -381,16 +388,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public RefreshTokenResult refreshToken(RefreshTokenCommand command) {
-        RequestContext context = command.getContext();
-        String rawRefreshToken = command.getRefreshToken();
+        RequestContext context = command.context();
+        String rawRefreshToken = command.refreshToken();
         OffsetDateTime now = OffsetDateTime.now();
 
         if (!jwtService.isTokenValid(rawRefreshToken)) {
             throw BusinessException(context, INVALID_INPUT_ERROR, INVALID_REFRESH_TOKEN_MESSAGE);
         }
 
-        String tokenType = jwtService.extractTokenType(rawRefreshToken);
-        if (!"REFRESH".equals(tokenType)) {
+        // Token "type" is the single source of truth ("refresh" vs "access").
+        if (!jwtService.isRefreshToken(rawRefreshToken)) {
             throw BusinessException(context, INVALID_INPUT_ERROR, INVALID_REFRESH_TOKEN_MESSAGE);
         }
 
@@ -448,8 +455,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(LogoutCommand command) {
-        RequestContext context = command.getContext();
-        String refreshToken = command.getRefreshToken();
+        RequestContext context = command.context();
+        String refreshToken = command.refreshToken();
         OffsetDateTime now = OffsetDateTime.now();
 
         RefreshToken token = refreshTokenRepositoryPort.findByToken(refreshToken)
@@ -465,14 +472,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public ResendVerificationResult resendVerificationCode(ResendVerificationCommand command) {
-        User user = userRepositoryPort.findByEmail(command.getEmail())
-                .orElseThrow(() -> BusinessException(command.getContext(), RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
+        User user = userRepositoryPort.findByEmail(command.email())
+                .orElseThrow(() -> BusinessException(command.context(), RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
         OtpGenerationResult result = otpService.generateOtpAndSendMail(
-                command.getContext(), UserEvent.builder().userId(user.getId()).email(user.getEmail())
-                        .phoneNumber(user.getPhoneNumber()).build(), command.getOtpPurpose());
+                command.context(), UserEvent.builder().userId(user.getId()).email(user.getEmail())
+                        .phoneNumber(user.getPhoneNumber()).build(), command.otpPurpose());
 
-        OffsetDateTime expiredAt = result.getExpiredAt();
+        OffsetDateTime expiredAt = result.expiredAt();
 
         long expiresAfterSeconds = Duration.between(OffsetDateTime.now(), expiredAt).getSeconds();
 
@@ -483,11 +490,54 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
 
+    @Override
+    @Transactional
+    public ResetPasswordResult resetPassword(ResetPasswordCommand command) {
+        Otp otp = otpRepositoryPort.findLatestActiveOtp(command.userId(), OtpPurpose.FORGOT_PASSWORD)
+                .orElseThrow(() -> new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
+                        ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, OTP_NOT_FOUND_MESSAGE)));
+
+        User user = userRepositoryPort.findById(command.userId())
+                .orElseThrow(() -> new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
+                        ExceptionUtils.buildResultResponse(RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE)));
+
+        if(!passwordEncoder.matches(command.otpCode(), otp.getOtpHash())) {
+            otp.setAttemptCount(otp.getAttemptCount() + 1);
+            otpRepositoryPort.save(otp);
+            throw new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
+                    ExceptionUtils.buildResultResponse(INVALID_INPUT_ERROR, INVALID_OTP_CODE_MESSAGE));
+        }
+
+        if(!command.newPassword().equals(command.confirmNewPassword())) {
+            throw new BusinessException(command.context().requestId(), command.context().requestDateTime(), command.context().channel(),
+                    ExceptionUtils.buildResultResponse(INVALID_INPUT_ERROR, CONFIRM_PASSWORD_NOT_MATCHED));
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(command.newPassword()));
+        user.setUpdatedAt(OffsetDateTime.now());
+        otp.setStatus(OtpStatus.USED);
+        otp.setConsumedAt(OffsetDateTime.now());
+        userRepositoryPort.save(user);
+        otpRepositoryPort.save(otp);
+
+        refreshTokenRepositoryPort.updateAllByUserIdAndStatus(
+                user.getId(),
+                RefreshTokenStatus.ACTIVE,
+                RefreshTokenStatus.REVOKED,
+                OffsetDateTime.now()
+        );
+
+        sLog.info("[RESET-PASSWORD] Password reset successfully with RequestId: {}", command.context().requestId());
+        return ResetPasswordResult.builder()
+                .userId(command.userId())
+                .build();
+    }
+
     private BusinessException BusinessException(RequestContext context, String code, String description) {
         return new BusinessException(
-                context.getRequestId(),
-                context.getRequestDateTime(),
-                context.getChannel(),
+                context.requestId(),
+                context.requestDateTime(),
+                context.channel(),
                 ExceptionUtils.buildResultResponse(code, description)
         );
     }

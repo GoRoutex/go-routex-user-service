@@ -39,15 +39,15 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public OtpGenerationResult createClientOtp(OtpGenerationCommand command) {
-        otpRepositoryPort.findLatestActiveOtp(command.getUserId(), command.getPurpose())
+        otpRepositoryPort.findLatestActiveOtp(command.userId(), command.purpose())
             .ifPresent(existing -> {
                 if (existing.getProducedAt() != null) {
                     long seconds = Duration.between(existing.getProducedAt(), OffsetDateTime.now()).getSeconds();
                     if (seconds < RESEND_COOLDOWN_SECONDS) {
                         throw new BusinessException(
-                                command.getContext().getRequestId(),
-                                command.getContext().getRequestDateTime(),
-                                command.getContext().getChannel(),
+                                command.context().requestId(),
+                                command.context().requestDateTime(),
+                                command.context().channel(),
                                 ExceptionUtils.buildResultResponse(OTP_COOL_DOWN, OTP_COOL_DOWN_MESSAGE)
                         );
                     }
@@ -62,10 +62,10 @@ public class VerificationServiceImpl implements VerificationService {
         String plainOtp = generateOtp();
         Otp otp = Otp.builder()
                 .id(UUID.randomUUID().toString())
-                .userId(command.getUserId())
-                .phoneNumber(command.getPhoneNumber())
-                .email(command.getEmail())
-                .purpose(command.getPurpose())
+                .userId(command.userId())
+                .phoneNumber(command.phoneNumber())
+                .email(command.email())
+                .purpose(command.purpose())
                 .expiredAt(OffsetDateTime.now().plusMinutes(EXPIRED_OTP_MINUTES))
                 .producedAt(OffsetDateTime.now())
                 .otpHash(passwordEncoder.encode(plainOtp))
@@ -83,8 +83,8 @@ public class VerificationServiceImpl implements VerificationService {
         long expiresMinutes = ChronoUnit.MINUTES.between(OffsetDateTime.now(), otp.getExpiredAt());
         return OtpGenerationResult.builder()
                 .plainOtp(plainOtp)
-                .userId(command.getUserId())
-                .email(command.getEmail())
+                .userId(command.userId())
+                .email(command.email())
                 .expiredAt(otp.getExpiredAt())
                 .expiresMinutes(expiresMinutes)
                 .build();

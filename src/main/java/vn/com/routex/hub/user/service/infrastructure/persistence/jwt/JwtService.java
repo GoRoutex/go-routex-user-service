@@ -44,6 +44,7 @@ public class JwtService {
         Set<String> authorities = userAuthorizationService.getAuthorities(user.getId());
 
         Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "access");
         claims.put("email", user.getEmail());
         claims.put("roles", roles);
         claims.put("authorities", authorities);
@@ -67,7 +68,7 @@ public class JwtService {
                 .issuer(jwtProperties.getIssuer())
                 .subject(user.getId())
                 .claim("type", "refresh")
-                .claim("tokenType", "REFRESH")
+                .claim("email", user.getEmail())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(secretKey)
@@ -88,8 +89,14 @@ public class JwtService {
     }
 
     public String extractTokenType(String token) {
-        Object tokenType = extractAllClaims(token).get("tokenType");
-        return tokenType == null ? null : tokenType.toString();
+        // Backward-compatible: old tokens used "tokenType" while newer tokens use "type".
+        Claims claims = extractAllClaims(token);
+        Object tokenType = claims.get("tokenType");
+        if (tokenType != null) {
+            return tokenType.toString();
+        }
+        Object type = claims.get("type");
+        return type == null ? null : type.toString();
     }
 
     public OffsetDateTime extractIssuedAt(String token) {

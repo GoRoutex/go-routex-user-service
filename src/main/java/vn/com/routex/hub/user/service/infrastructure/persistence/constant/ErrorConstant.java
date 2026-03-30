@@ -12,7 +12,7 @@ public class ErrorConstant {
     public static final String SPRING_DATA_NOT_FOUND_MESSAGE = "Customer membership information not found";
 
     public static final String RECORD_NOT_FOUND_MESSAGE = "Record not found";
-    public static final String OTP_NOT_FOUND_MESSAGE = "OTP Firm not found";
+    public static final String OTP_NOT_FOUND_MESSAGE = "OTP not found";
     public static final String SUCCESS_CODE = "0000";
     public static final String SUCCESS_MESSAGE = "Success";
     public static final String DRIVER_NOT_FOND_MESSAGE = "Driver Profile not found";

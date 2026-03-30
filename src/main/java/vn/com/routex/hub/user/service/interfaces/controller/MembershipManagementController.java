@@ -53,18 +53,18 @@ public class MembershipManagementController {
                 .data(GetMyMembershipResponse.GetMyMembershipResponseData
                         .builder()
                         .userId(userId)
-                        .currentPoint(result.getCurrentPoint())
-                        .discountPercent(result.getBenefit().getDiscountPercent())
-                        .priorityLevel(result.getBenefit().getPriorityLevel())
+                        .currentPoint(result.currentPoint())
+                        .discountPercent(result.benefit().discountPercent())
+                        .priorityLevel(result.benefit().priorityLevel())
                         .build())
                 .stats(GetMyMembershipResponse.GetMyMembershipStats
                         .builder()
-                        .badge(result.getBenefit().getBadge())
-                        .totalTrips(result.getBenefit().getTotalTrips())
-                        .totalSpent(result.getBenefit().getTotalSpent())
-                        .pointMultiplier(result.getBenefit().getPointMultiplier())
-                        .pointToNextTier(result.getBenefit().getPointToNextTier())
-                        .nextTierName(result.getBenefit().getNextTierName())
+                        .badge(result.benefit().badge())
+                        .totalTrips(result.benefit().totalTrips())
+                        .totalSpent(result.benefit().totalSpent())
+                        .pointMultiplier(result.benefit().pointMultiplier())
+                        .pointToNextTier(result.benefit().pointToNextTier())
+                        .nextTierName(result.benefit().nextTierName())
                         .build())
                 .build());
 

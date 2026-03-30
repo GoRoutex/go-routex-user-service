@@ -12,6 +12,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
 import vn.com.routex.hub.user.service.application.service.EmailService;
+import vn.com.routex.hub.user.service.domain.otp.model.OtpPurpose;
 import vn.com.routex.hub.user.service.infrastructure.persistence.config.SendGridMailProperties;
 
 import java.io.IOException;
@@ -31,13 +32,22 @@ public class EmailServiceImpl implements EmailService {
 
         Map<String, Object> variables = getStringObjectMap(command);
 
-        String htmlBody = emailTemplateService.processTemplate(
-                "email/verification-code",
-                variables
-        );
+        String htmlBody = null;
+
+        if(OtpPurpose.REGISTER_VERIFY.equals(command.purpose())) {
+            htmlBody = emailTemplateService.processTemplate(
+                    "email/verification-code",
+                    variables
+            );
+        } else {
+            htmlBody = emailTemplateService.processTemplate(
+                    "email/forgot-password",
+                    variables
+            );
+        }
 
         Email from = new Email(properties.getFromEmail(), properties.getFromName());
-        Email to = new Email(command.getToEmail());
+        Email to = new Email(command.toEmail());
         Content content = new Content("text/html", htmlBody);
         Mail mail = new Mail(from, properties.getVerifySubject(), to, content);
 
@@ -64,9 +74,9 @@ public class EmailServiceImpl implements EmailService {
 
     private @NonNull Map<String, Object> getStringObjectMap(EmailMessageCommand command) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("fullName", (command.getFullName() == null || command.getFullName().isBlank()) ? "bạn" : command.getFullName());
-        variables.put("otpCode", command.getVerificationCode());
-        variables.put("expiredMinutes", command.getExpireMinutes());
+        variables.put("fullName", (command.fullName() == null || command.fullName().isBlank()) ? "bạn" : command.fullName());
+        variables.put("otpCode", command.verificationCode());
+        variables.put("expiredMinutes", command.expireMinutes());
         return variables;
     }
 }

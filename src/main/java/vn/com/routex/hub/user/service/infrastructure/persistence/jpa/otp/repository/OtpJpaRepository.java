@@ -17,8 +17,9 @@ public interface OtpJpaRepository extends JpaRepository<OtpJpaEntity, String> {
     WHERE o.userId = :userId
       AND o.purpose = :purpose
       AND o.consumedAt IS NULL
+      AND o.status = 'ACTIVE'
     ORDER BY o.createdAt DESC
-        """)
+    """)
     Optional<OtpJpaEntity> findLatestActiveOtp(@Param("userId") String userId,
                                                @Param("purpose") OtpPurpose purpose);
 }

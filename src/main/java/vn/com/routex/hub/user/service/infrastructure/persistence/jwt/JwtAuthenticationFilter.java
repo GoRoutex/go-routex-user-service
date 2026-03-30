@@ -43,7 +43,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             Claims claims = jwtService.extractAllClaims(token);
             String userId = claims.getSubject();
-            String username = claims.get("username", String.class);
+            String email = claims.get("email", String.class);
+            String principal = (email != null && !email.isBlank()) ? email : userId;
             String tokenType = claims.get("type", String.class);
 
             if("refresh".equals(tokenType)) {
@@ -80,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(
-                                username != null ? username : userId,
+                                principal,
                                 null,
                                 grantedAuthorities
                         );

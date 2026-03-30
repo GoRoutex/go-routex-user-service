@@ -57,11 +57,11 @@ public class TokenManagementController {
                         .description(SUCCESS_MESSAGE)
                         .build())
                 .data(RefreshTokenResponse.RefreshTokenResponseData.builder()
-                        .accessToken(result.getAccessToken())
-                        .refreshToken(result.getRefreshToken())
-                        .userId(result.getUserId())
-                        .accessTokenExpiredAt(result.getAccessTokenExpiredAt())
-                        .refreshTokenExpiredAt(result.getRefreshTokenExpiredAt())
+                        .accessToken(result.accessToken())
+                        .refreshToken(result.refreshToken())
+                        .userId(result.userId())
+                        .accessTokenExpiredAt(result.accessTokenExpiredAt())
+                        .refreshTokenExpiredAt(result.refreshTokenExpiredAt())
                         .build())
                 .build());
     }
