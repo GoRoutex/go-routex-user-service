@@ -10,6 +10,7 @@ public class ApiConstant {
     public static final String COMPLETE_PROFILE = "/complete-profile";
     public static final String AUTHENTICATION = "/authentication";
     public static final String REGISTER = "/register";
+    public static final String UPDATE_PATH = "/update";
     public static final String LOGIN = "/login";
     public static final String VERIFY_CODE = "/verify";
     public static final String CHANGE_PASSWORD = "/change-password";

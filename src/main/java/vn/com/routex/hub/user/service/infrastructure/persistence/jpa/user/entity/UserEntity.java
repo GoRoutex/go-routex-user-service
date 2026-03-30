@@ -31,9 +31,6 @@ public class UserEntity extends AbstractAuditingJpaEntity {
     @Id
     private String id;
 
-    @Column(name = "CUSTOMER_MEMBERSHIP_ID")
-    private String customerMembershipId;
-
     @Column(name = "PASSWORD_HASH", nullable = false)
     private String passwordHash;
 

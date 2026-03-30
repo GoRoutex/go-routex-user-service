@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import vn.com.routex.hub.user.service.domain.membership.model.MembershipBadge;
 import vn.com.routex.hub.user.service.domain.user.model.Gender;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
@@ -21,10 +22,35 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 public class GetMyProfileResponse {
-
-
     private ApiResult result;
     private GetMyProfileResponseData data;
+    private GetMyMembershipResponseData membership;
+    private GetMyMembershipStats stats;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @SuperBuilder
+    public static class GetMyMembershipResponseData {
+        private BigDecimal currentPoint;
+        private Integer discountPercent;
+        private Integer priorityLevel;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @SuperBuilder
+    public static class GetMyMembershipStats {
+        private Integer totalTrips;
+        private String badge;
+        private BigDecimal totalSpent;
+        private BigDecimal pointToNextTier;
+        private BigDecimal pointMultiplier;
+        private MembershipBadge nextTierName;
+    }
 
 
     @Getter

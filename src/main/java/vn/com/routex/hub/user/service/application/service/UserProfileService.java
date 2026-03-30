@@ -6,6 +6,8 @@ import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileComman
 import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileResult;
 import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileCommand;
 import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileResult;
+import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileCommand;
+import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileResult;
 
 public interface UserProfileService {
 
@@ -14,4 +16,6 @@ public interface UserProfileService {
     GetMyProfileResult getMyProfile(GetMyProfileCommand command);
 
     CompleteProfileResult completeProfile(CompleteProfileCommand build);
+
+    UpdateProfileResult updateProfile(UpdateProfileCommand command);
 }

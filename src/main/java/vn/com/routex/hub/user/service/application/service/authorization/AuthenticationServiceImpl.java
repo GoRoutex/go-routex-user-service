@@ -142,6 +142,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         String userId = UUID.randomUUID().toString();
+        String customerId = UUID.randomUUID().toString();
+
         User registeredUser = User.builder()
                 .id(userId)
                 .passwordHash(passwordEncoder.encode(command.password()))
@@ -156,14 +158,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
 
         Customer customer = Customer.builder()
-                .id(UUID.randomUUID().toString())
+                .id(customerId)
                 .userId(userId)
                 .status(CustomerStatus.ACTIVE)
                 .build();
 
+        String customerMembershipId = UUID.randomUUID().toString();
         CustomerMembership customerMembership = CustomerMembership.builder()
-                .id(UUID.randomUUID().toString())
-                .customerId(customer.getId())
+                .id(customerMembershipId)
+                .customerId(customerId)
                 .membershipTierId(MembershipTierGroup.BRONZE.getId())
                 .currentAvailablePoints(BigDecimal.ZERO)
                 .totalPoints(BigDecimal.ZERO)
@@ -315,6 +318,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .roles(roles)
+                .email(user.getEmail())
                 .authorities(authorities)
                 .profileCompleted(user.getProfileCompleted())
                 .build();

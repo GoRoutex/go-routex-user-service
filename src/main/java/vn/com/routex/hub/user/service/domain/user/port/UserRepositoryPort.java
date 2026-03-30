@@ -13,4 +13,6 @@ public interface UserRepositoryPort {
     boolean existsByPhoneNumber(String phoneNumber);
 
     User save(User user);
+
+    boolean existsByEmail(String email);
 }

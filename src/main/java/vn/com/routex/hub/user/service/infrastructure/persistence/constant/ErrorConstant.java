@@ -8,6 +8,8 @@ public class ErrorConstant {
     public static final String TIMEOUT_ERROR = "0600";
     public static final String TIMEOUT_ERROR_MESSAGE = "Timeout";
     public static final String RECORD_NOT_FOUND = "1407";
+    public static final String OPERATION_NOT_ALLOWED = "4030";
+    public static final String USER_NOT_ACTIVE_MESSAGE = "User is not currently active";
     public static final String INVALID_USERNAME_EMAIL_MESSAGE = "Username or email is incorrect";
     public static final String SPRING_DATA_NOT_FOUND_MESSAGE = "Customer membership information not found";
 
@@ -29,7 +31,6 @@ public class ErrorConstant {
     public static final String INVALID_INPUT_ERROR = "0310";
     public static final String INVALID_REFRESH_TOKEN_MESSAGE = "Invalid refresh token";
     public static final String AUTHORIZATION_ERROR = "3200";
-    public static final String USER_NOT_ACTIVE_MESSAGE = "User is not active yet";
     public static final String INVALID_USERNAME_OR_PASSWORD_MESSAGE = "Invalid username or password !";
     public static final String INVALID_PASSWORD = "Password is incorrect!";
     public static final String INVALID_NEW_PASSWORD = "New password must be different from current one";
@@ -39,6 +40,8 @@ public class ErrorConstant {
     public static final String INVALID_REQUEST_TIMESTAMP = "5186";
     public static final String DUPLICATE_ERROR = "9400";
     public static final String RECORD_EXISTS = "Record already exists";
+    public static final String EMAIL_EXISTS = "Email already exists";
+
     public static final String USER_EXISTS = "User already exists";
     public static final String USERNAME_EXISTS = "Username already exists";
     public static final String PHONE_NUMBER_EXISTS = "Phone Number already exists";
