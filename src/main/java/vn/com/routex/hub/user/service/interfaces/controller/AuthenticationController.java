@@ -19,6 +19,8 @@ import vn.com.routex.hub.user.service.application.dto.authentication.LoginResult
 import vn.com.routex.hub.user.service.application.dto.authentication.LogoutCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationResult;
+import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordCommand;
+import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
@@ -34,6 +36,9 @@ import vn.com.routex.hub.user.service.interfaces.models.password.ChangePasswordR
 import vn.com.routex.hub.user.service.interfaces.models.password.ChangePasswordResponse;
 import vn.com.routex.hub.user.service.interfaces.models.password.ForgotPasswordRequest;
 import vn.com.routex.hub.user.service.interfaces.models.password.ForgotPasswordResponse;
+import vn.com.routex.hub.user.service.interfaces.models.password.ResetPasswordRequest;
+import vn.com.routex.hub.user.service.interfaces.models.password.ResetPasswordResponse;
+import vn.com.routex.hub.user.service.interfaces.models.password.ResetPasswordResponse.ResetPasswordResponseData;
 import vn.com.routex.hub.user.service.interfaces.models.register.RegistrationRequest;
 import vn.com.routex.hub.user.service.interfaces.models.register.RegistrationResponse;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
@@ -51,6 +56,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.LOGOUT;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.REGISTER;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.RESEND_VERIFY_CODE;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.RESET_PASSWORD;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.USER_SERVICE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.VERIFY_CODE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_CODE;
@@ -87,10 +93,10 @@ public class AuthenticationController {
                 .channel(request.getChannel())
                 .result(successResult())
                 .data(RegistrationResponse.RegistrationResponseData.builder()
-                        .userId(result.getUserId())
-                        .email(result.getEmail())
-                        .phoneNumber(result.getPhoneNumber())
-                        .status(result.getStatus())
+                        .userId(result.userId())
+                        .email(result.email())
+                        .phoneNumber(result.phoneNumber())
+                        .status(result.status())
                         .build())
                 .build());
     }
@@ -109,9 +115,9 @@ public class AuthenticationController {
                 .channel(request.getChannel())
                 .result(successResult())
                 .data(VerifyCodeResponse.VerifyCodeResponseData.builder()
-                        .userId(result.getUserId())
-                        .otpCode(result.getOtpCode())
-                        .status(result.getStatus())
+                        .userId(result.userId())
+                        .otpCode(result.otpCode())
+                        .status(result.status())
                         .build())
                 .build());
     }
@@ -130,13 +136,13 @@ public class AuthenticationController {
                 .channel(request.getChannel())
                 .result(successResult())
                 .data(LoginResponse.LoginResponseData.builder()
-                        .accessToken(result.getAccessToken())
-                        .refreshToken(result.getRefreshToken())
-                        .userId(result.getUserId())
-                        .email(result.getEmail())
-                        .roles(result.getRoles())
-                        .authorities(result.getAuthorities())
-                        .profileCompleted(result.getProfileCompleted())
+                        .accessToken(result.accessToken())
+                        .refreshToken(result.refreshToken())
+                        .userId(result.userId())
+                        .email(result.email())
+                        .roles(result.roles())
+                        .authorities(result.authorities())
+                        .profileCompleted(result.profileCompleted())
                         .build())
                 .build());
     }
@@ -157,18 +163,16 @@ public class AuthenticationController {
                 .channel(request.getChannel())
                 .result(successResult())
                 .data(ChangePasswordResponse.ChangePasswordResponseData.builder()
-                        .userId(result.getUserId())
-                        .changeAt(result.getChangeAt())
+                        .userId(result.userId())
+                        .changeAt(result.changeAt())
                         .build())
                 .build());
     }
-
 
     @PostMapping(AUTHENTICATION + FORGOT_PASSWORD)
     public ResponseEntity<ForgotPasswordResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         ForgotPasswordResult result = authenticationService.forgotPassword(ForgotPasswordCommand.builder()
                 .context(toContext(request))
-                .username(request.getData().getUsername())
                 .email(request.getData().getEmail())
                 .build());
 
@@ -178,12 +182,11 @@ public class AuthenticationController {
                 .channel(request.getChannel())
                 .result(successResult())
                 .data(ForgotPasswordResponse.ForgotPasswordResponseData.builder()
-                        .userId(result.getUserId())
-                        .expiresMinutes(result.getExpiresMinutes())
+                        .userId(result.userId())
+                        .expiresMinutes(result.expiresMinutes())
                         .build())
                 .build());
     }
-
 
     @PostMapping(AUTHENTICATION + LOGOUT)
     public ResponseEntity<LogoutResponse> logout(@Valid @RequestBody LogoutRequest request) {
@@ -200,6 +203,32 @@ public class AuthenticationController {
                 .build());
     }
 
+    @PostMapping(AUTHENTICATION + RESET_PASSWORD)
+    public ResponseEntity<ResetPasswordResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        ResetPasswordResult result = authenticationService.resetPassword(ResetPasswordCommand.builder()
+                        .context(toContext(request))
+                .userId(request.getData().getUserId())
+                .otpCode(request.getData().getOtpCode())
+                .newPassword(request.getData().getNewPassword())
+                .confirmNewPassword(request.getData().getConfirmPassword())
+                .build());
+
+
+        ResetPasswordResponse response = ResetPasswordResponse.builder()
+                .requestId(request.getRequestId())
+                .requestDateTime(request.getRequestDateTime())
+                .channel(request.getChannel())
+                .result(ApiResult.builder()
+                        .responseCode(SUCCESS_CODE)
+                        .description(SUCCESS_MESSAGE)
+                        .build())
+                .data(ResetPasswordResponseData.builder()
+                        .userId(result.userId())
+                        .build())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping(AUTHENTICATION + RESEND_VERIFY_CODE)
     public ResponseEntity<ResendVerificationResponse> resendVerificationCode(@Valid @RequestBody ResendVerificationRequest request) {
@@ -217,7 +246,7 @@ public class AuthenticationController {
                         .description(SUCCESS_MESSAGE)
                         .build())
                 .data(ResendVerificationResponse.ResendVerificationResponseData.builder()
-                        .retryAfterSeconds(result.getRetryAfterSeconds())
+                        .retryAfterSeconds(result.retryAfterSeconds())
                         .build())
                 .build();
 

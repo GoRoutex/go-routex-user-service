@@ -1,24 +1,17 @@
 package vn.com.routex.hub.user.service.application.dto.verification;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.OffsetDateTime;
 
-@Getter
-@Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class OtpGenerationResult {
-
-    private String plainOtp;
-    private String fullName;
-    private String email;
-    private String userId;
-    private OffsetDateTime expiredAt;
-    private Long expiresMinutes;
+public record OtpGenerationResult(
+        String plainOtp,
+        String fullName,
+        String email,
+        String userId,
+        OffsetDateTime expiredAt,
+        Long expiresMinutes
+) {
 }
+

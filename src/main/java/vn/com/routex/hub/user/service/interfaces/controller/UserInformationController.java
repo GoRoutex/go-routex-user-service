@@ -4,6 +4,7 @@ package vn.com.routex.hub.user.service.interfaces.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -61,13 +62,13 @@ public class UserInformationController {
                 .build());
 
         GetMyProfileResponse.MyCustomerProfile myProfile = GetMyProfileResponse.MyCustomerProfile.builder()
-                .customerId(result.getCustomer().getCustomerId())
-                .fullName((result.getCustomer().getFullName()))
-                .tripPoints(result.getCustomer().getTripPoints())
-                .totalTrips(result.getCustomer().getTotalTrips())
-                .totalSpent(result.getCustomer().getTotalSpent())
-                .lastTripAt(result.getCustomer().getLastTripAt())
-                .lastBookingAt(result.getCustomer().getLastBookingAt())
+                .customerId(result.customer().customerId())
+                .fullName(result.customer().fullName())
+                .tripPoints(result.customer().tripPoints())
+                .totalTrips(result.customer().totalTrips())
+                .totalSpent(result.customer().totalSpent())
+                .lastTripAt(result.customer().lastTripAt())
+                .lastBookingAt(result.customer().lastBookingAt())
                 .build();
 
         return ResponseEntity.ok(GetMyProfileResponse.builder()
@@ -77,25 +78,26 @@ public class UserInformationController {
                                 .build())
                 .data(GetMyProfileResponse.GetMyProfileResponseData
                         .builder()
-                        .userId(result.getUserId())
-                        .email(result.getEmail())
-                        .phone(result.getPhone())
-                        .status(result.getStatus())
-                        .gender(result.getGender())
-                        .avatarUrl(result.getAvatarUrl())
-                        .address(result.getAddress())
-                        .nationalId(result.getNationalId())
-                        .emailVerified(result.getEmailVerified())
-                        .phoneVerified(result.getPhoneVerified())
-                        .createdAt(result.getCreatedAt())
-                        .updatedAt(result.getUpdatedAt())
-                        .authorities(result.getAuthorities())
+                        .userId(result.userId())
+                        .email(result.email())
+                        .phone(result.phone())
+                        .status(result.status())
+                        .gender(result.gender())
+                        .avatarUrl(result.avatarUrl())
+                        .address(result.address())
+                        .nationalId(result.nationalId())
+                        .emailVerified(result.emailVerified())
+                        .phoneVerified(result.phoneVerified())
+                        .createdAt(result.createdAt())
+                        .updatedAt(result.updatedAt())
+                        .authorities(result.authorities())
                         .customer(myProfile)
                         .build())
                 .build());
     }
 
     @PostMapping(PROFILE_PATH)
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('profile:view')")
     public ResponseEntity<GetUserProfileResponse> getProfiles(@Valid @RequestBody GetUserProfileRequest request) {
         GetUserProfileResult result = userProfileService.getUserProfile(GetUserProfileCommand.builder()
                         .context(toContext(request))
@@ -113,16 +115,16 @@ public class UserInformationController {
                         .build())
                 .data(GetUserProfileResponse.GetUserProfileResponseData
                         .builder()
-                        .userId(result.getUserId())
-                        .username(result.getUsername())
-                        .email(result.getEmail())
-                        .phone(result.getPhone())
-                        .fullName(result.getFullName())
-                        .status(result.getStatus())
-                        .emailVerified(result.getEmailVerified())
-                        .phoneVerified(result.getPhoneVerified())
-                        .createdAt(result.getCreatedAt())
-                        .updatedAt(result.getUpdatedAt())
+                        .userId(result.userId())
+                        .username(result.username())
+                        .email(result.email())
+                        .phone(result.phone())
+                        .fullName(result.fullName())
+                        .status(result.status())
+                        .emailVerified(result.emailVerified())
+                        .phoneVerified(result.phoneVerified())
+                        .createdAt(result.createdAt())
+                        .updatedAt(result.updatedAt())
                         .build())
                 .build());
     }
@@ -151,12 +153,12 @@ public class UserInformationController {
                         .description(SUCCESS_MESSAGE)
                         .build())
                 .data(CompleteProfileResponse.CompleteProfileResponseData.builder()
-                        .userId(result.getUserId())
-                        .fullName(result.getFullName())
-                        .gender(result.getGender())
-                        .avatarUrl(result.getAvatarUrl())
-                        .profileCompleted(result.getProfileCompleted())
-                        .address(result.getAddress())
+                        .userId(result.userId())
+                        .fullName(result.fullName())
+                        .gender(result.gender())
+                        .avatarUrl(result.avatarUrl())
+                        .profileCompleted(result.profileCompleted())
+                        .address(result.address())
                         .build())
                 .build();
 

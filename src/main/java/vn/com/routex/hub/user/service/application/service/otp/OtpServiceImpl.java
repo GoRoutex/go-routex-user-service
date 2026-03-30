@@ -33,13 +33,13 @@ public class OtpServiceImpl implements OtpService {
                 .build());
 
         sLog.info("OTP: {}", otpResult);
-        sLog.info("Sending Email");
         emailService.sendEmail(EmailMessageCommand.builder()
-                .toEmail(otpResult.getEmail())
-                .userId(otpResult.getUserId())
-                .fullName(otpResult.getFullName())
-                .verificationCode(otpResult.getPlainOtp())
-                .expireMinutes(otpResult.getExpiresMinutes())
+                .toEmail(otpResult.email())
+                .userId(otpResult.userId())
+                .fullName(otpResult.fullName())
+                .verificationCode(otpResult.plainOtp())
+                .expireMinutes(otpResult.expiresMinutes())
+                .purpose(otpPurpose)
                 .build());
 
 
