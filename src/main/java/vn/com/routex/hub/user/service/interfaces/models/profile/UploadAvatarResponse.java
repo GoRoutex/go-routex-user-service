@@ -1,33 +1,26 @@
 package vn.com.routex.hub.user.service.interfaces.models.profile;
 
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
+import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @SuperBuilder
-public class GetUserProfileRequest extends BaseRequest {
-
-
-    @Valid
-    @NotNull
-    private GetUserProfileRequestData data;
+public class UploadAvatarResponse extends BaseResponse<UploadAvatarResponse.UploadAvatarResponseData> {
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @SuperBuilder
-    public static class GetUserProfileRequestData {
+    public static class UploadAvatarResponseData {
         private String userId;
+        private String avatarUrl;
     }
 }
+

@@ -38,6 +38,11 @@ spring:
       name: ${SPRING_SECURITY_USER_NAME:admin}
       password: ${SPRING_SECURITY_USER_PASSWORD:admin}
 
+  servlet:
+    multipart:
+      max-file-size: ${MULTIPART_MAX_FILE_SIZE:6MB}
+      max-request-size: ${MULTIPART_MAX_REQUEST_SIZE:6MB}
+
 management:
   endpoint:
     health:
@@ -49,22 +54,8 @@ management:
     readinessstate:
       enabled: true
 
-jms:
-  thread:
-    receive:
-      timeout-seconds: ${JMS_THREAD_RECEIVE_TIMEOUT_SECONDS:30}
-    send:
-      timeout-seconds: ${JMS_THREAD_SEND_TIMEOUT_SECONDS:5}
-  receive:
-    timeout: ${JMS_RECEIVE_TIMEOUT:30000}
-  caching:
-    session-cache-size: ${JMS_CACHING_SESSION_CACHE_SIZE:256}
-  time-to-live-milliseconds: ${JMS_TIME_TO_LIVE_MILLISECONDS:20000}
-  recovery-interval: ${JMS_RECOVERY_INTERVAL:5000}
-  max-message: ${JMS_MAX_MESSAGE:1}
-
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:8081}
 
 client:
   verify:

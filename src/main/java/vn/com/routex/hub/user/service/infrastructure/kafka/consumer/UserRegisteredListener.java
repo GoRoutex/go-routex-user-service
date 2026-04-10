@@ -9,8 +9,6 @@ import vn.com.routex.hub.user.service.application.service.OtpService;
 import vn.com.routex.hub.user.service.infrastructure.kafka.event.OtpMailEvent;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 
-import java.util.concurrent.CompletableFuture;
-
 @Component
 @RequiredArgsConstructor
 public class UserRegisteredListener {
@@ -18,21 +16,19 @@ public class UserRegisteredListener {
     private final OtpService otpService;
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
-
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Async("mailExecutor")
     public void handle(OtpMailEvent event) {
 
         try {
             sLog.info("[EVENT-CONSUMER] Consume event successfully");
-
-            CompletableFuture.runAsync(() -> otpService.generateOtpAndSendMail(
+            otpService.generateOtpAndSendMail(
                     event.context(),
                     event.userEvent(),
                     event.purpose()
-            ));
-        } catch(Exception e) {
-            sLog.info("[EVENT-CONSUMER] Error while processing OtpMailEvent");
+            );
+        } catch (Exception e) {
+            sLog.info("[EVENT-CONSUMER] Error while processing OtpMailEvent", e);
         }
     }
 }

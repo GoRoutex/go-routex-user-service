@@ -1,7 +1,6 @@
 package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.customer;
 
 import lombok.experimental.UtilityClass;
-import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.customer.model.CustomerMembership;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerMembershipEntity;
 
@@ -12,6 +11,7 @@ public class CustomerMembershipPersistenceMapper {
         return CustomerMembershipEntity
                 .builder()
                 .id(customerMembership.getId())
+                .customerId(customerMembership.getCustomerId())
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())
@@ -28,6 +28,7 @@ public class CustomerMembershipPersistenceMapper {
         return CustomerMembership
                 .builder()
                 .id(customerMembership.getId())
+                .customerId(customerMembership.getCustomerId())
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())

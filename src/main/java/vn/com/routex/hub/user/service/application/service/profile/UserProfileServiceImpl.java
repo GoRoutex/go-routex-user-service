@@ -20,7 +20,6 @@ import vn.com.routex.hub.user.service.application.query.CustomerMembershipQueryR
 import vn.com.routex.hub.user.service.application.service.UserProfileService;
 import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
-import vn.com.routex.hub.user.service.domain.customer.port.CustomerMembershipRepositoryPort;
 import vn.com.routex.hub.user.service.domain.customer.port.CustomerRepositoryPort;
 import vn.com.routex.hub.user.service.domain.membership.model.MembershipTier;
 import vn.com.routex.hub.user.service.domain.membership.port.MembershipTierRepositoryPort;

@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -42,12 +43,14 @@ public class JwtService {
 
         Set<String> roles = userAuthorizationService.getRoles(user.getId());
         Set<String> authorities = userAuthorizationService.getAuthorities(user.getId());
+        String merchantId = userAuthorizationService.getMerchantId(user.getId()).orElse(null);
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");
         claims.put("email", user.getEmail());
         claims.put("roles", roles);
         claims.put("authorities", authorities);
+        claims.put("merchantId", merchantId);
 
         return Jwts.builder()
                 .issuer(jwtProperties.getIssuer())
@@ -63,12 +66,14 @@ public class JwtService {
     public String generateRefreshToken(User user) {
         Instant now = Instant.now();
         Instant expiry = now.plus(jwtProperties.getRefreshTokenExpirationDays(), ChronoUnit.DAYS);
+        Optional<String> merchantId = userAuthorizationService.getMerchantId(user.getId());
 
         return Jwts.builder()
                 .issuer(jwtProperties.getIssuer())
                 .subject(user.getId())
                 .claim("type", "refresh")
                 .claim("email", user.getEmail())
+                .claim("merchantId", merchantId.orElse(null))
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiry))
                 .signWith(secretKey)

@@ -15,10 +15,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -44,8 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = jwtService.extractAllClaims(token);
             String userId = claims.getSubject();
             String email = claims.get("email", String.class);
-            String principal = (email != null && !email.isBlank()) ? email : userId;
             String tokenType = claims.get("type", String.class);
+            String merchantId = claims.get("merchantId", String.class);
 
             if("refresh".equals(tokenType)) {
                 filterChain.doFilter(request, response);
@@ -56,28 +58,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Set<SimpleGrantedAuthority> grantedAuthorities = new HashSet<>();
 
                 Object rolesClaim = claims.get("roles");
+                Set<String> roles = Collections.emptySet();
 
-                if(rolesClaim instanceof Collection<?> roles) {
-                    roles.stream()
+                if(rolesClaim instanceof Collection<?> roleClaims) {
+                    roles = roleClaims.stream()
                             .filter(Objects::nonNull)
                             .map(Object::toString)
                             .map(String::trim)
                             .filter(role -> !role.isBlank())
                             .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                            .collect(Collectors.toSet());
+
+                    roles.stream()
+                            .filter(Objects::nonNull)
                             .map(SimpleGrantedAuthority::new)
                             .forEach(grantedAuthorities::add);
                 }
 
                 Object authoritiesClaim = claims.get("authorities");
-                if(authoritiesClaim instanceof Collection<?> authorities) {
-                    authorities.stream()
+                Set<String> authorities = Collections.emptySet();
+                if(authoritiesClaim instanceof Collection<?> authorityClaims) {
+                    authorities = authorityClaims.stream()
                             .filter(Objects::nonNull)
                             .map(Object::toString)
                             .map(String::trim)
                             .filter(authority -> !authority.isBlank())
+                            .collect(Collectors.toSet());
+
+                    authorities.stream()
+                            .filter(Objects::nonNull)
                             .map(SimpleGrantedAuthority::new)
                             .forEach(grantedAuthorities::add);
                 }
+
+                JwtAuthenticatedUser principal = new JwtAuthenticatedUser(
+                        userId,
+                        email,
+                        merchantId,
+                        roles,
+                        authorities
+                );
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(

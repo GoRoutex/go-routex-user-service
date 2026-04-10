@@ -1,12 +1,12 @@
 package vn.com.routex.hub.user.service.application.service.authorization;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.routex.hub.user.service.application.dto.authentication.ChangePasswordCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.ChangePasswordResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.ForgotPasswordCommand;
@@ -90,6 +90,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_EXPIRED_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.REFRESH_TOKEN_NOT_FOUND_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.ROLE_NOT_FOUND_ERROR;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SYSTEM_ERROR;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_EXISTS;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_NOT_ACTIVE_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.USER_NOT_FOUND_MESSAGE;
@@ -122,17 +123,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (optUser.isPresent()) {
             User existingUser = optUser.get();
             if (UserStatus.VERIFYING.equals(existingUser.getStatus())) {
-                applicationEventPublisher.publishEvent(
-                        OtpMailEvent.builder()
-                                .context(context)
-                                .userEvent(UserEvent.builder()
-                                        .userId(existingUser.getId())
-                                        .email(existingUser.getEmail())
-                                        .phoneNumber(existingUser.getPhoneNumber())
-                                        .build())
-                                .purpose(OtpPurpose.REGISTER_VERIFY)
-                                .build()
-                );
+                try {
+                    // Generate Otp and Send Email with Transaction Propagation.REQUIRES_NEW (for throwing exception but still send mails)
+                    otpService.generateOtpAndSendMailRequiresNew(
+                            context,
+                            UserEvent.builder()
+                                    .userId(existingUser.getId())
+                                    .email(existingUser.getEmail())
+                                    .phoneNumber(existingUser.getPhoneNumber())
+                                    .build(),
+                            OtpPurpose.REGISTER_VERIFY
+                    );
+                } catch (Exception e) {
+                    sLog.info("[REGISTER] Resend verify email failed for VERIFYING userId={}", existingUser.getId(), e);
+                }
             }
             throw BusinessException(context, DUPLICATE_ERROR, USER_EXISTS);
         }
@@ -196,20 +200,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRoleRepositoryPort.save(userRoles);
 
 
-        sLog.info("[PUBLISHING-EVENT]  Event publishing .... ");
-
-        // Publish event for sending email
-        applicationEventPublisher.publishEvent(
-                OtpMailEvent.builder()
-                        .context(context)
-                        .userEvent(UserEvent.builder()
-                                .userId(registeredUser.getId())
-                                .email(registeredUser.getEmail())
-                                .phoneNumber(registeredUser.getPhoneNumber())
-                                .build())
-                        .purpose(OtpPurpose.REGISTER_VERIFY)
-                        .build()
-        );
+        try {
+            otpService.generateOtpAndSendMail(
+                    context,
+                    UserEvent.builder()
+                            .userId(registeredUser.getId())
+                            .email(registeredUser.getEmail())
+                            .phoneNumber(registeredUser.getPhoneNumber())
+                            .build(),
+                    OtpPurpose.REGISTER_VERIFY
+            );
+        } catch (Exception e) {
+            // Fail fast: if verification email can't be sent, rollback registration to avoid orphan VERIFYING users.
+            throw BusinessException(context, SYSTEM_ERROR, e.getMessage());
+        }
 
         return RegistrationResult.builder()
                 .userId(registeredUser.getId())
@@ -479,9 +483,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepositoryPort.findByEmail(command.email())
                 .orElseThrow(() -> BusinessException(command.context(), RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
 
-        OtpGenerationResult result = otpService.generateOtpAndSendMail(
-                command.context(), UserEvent.builder().userId(user.getId()).email(user.getEmail())
-                        .phoneNumber(user.getPhoneNumber()).build(), command.otpPurpose());
+        OtpGenerationResult result;
+        try {
+            result = otpService.generateOtpAndSendMail(
+                    command.context(),
+                    UserEvent.builder()
+                            .userId(user.getId())
+                            .email(user.getEmail())
+                            .phoneNumber(user.getPhoneNumber())
+                            .build(),
+                    command.otpPurpose()
+            );
+        } catch (Exception e) {
+            throw BusinessException(command.context(), SYSTEM_ERROR, "Failed to send verification email");
+        }
 
         OffsetDateTime expiredAt = result.expiredAt();
 

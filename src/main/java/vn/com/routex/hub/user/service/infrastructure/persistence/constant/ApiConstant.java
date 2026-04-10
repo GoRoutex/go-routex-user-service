@@ -8,6 +8,7 @@ public class ApiConstant {
     public static final String MEMBERSHIP_PATH = "/membership";
     public static final String PROFILE_PATH = "/profile";
     public static final String COMPLETE_PROFILE = "/complete-profile";
+    public static final String AVATAR_PATH = "/avatar";
     public static final String AUTHENTICATION = "/authentication";
     public static final String REGISTER = "/register";
     public static final String UPDATE_PATH = "/update";

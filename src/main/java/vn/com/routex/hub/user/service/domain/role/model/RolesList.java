@@ -6,4 +6,6 @@ public enum RolesList {
     STAFF,
     ADMIN,
     CUSTOMER,
+    MERCHANT_OWNER,
+    MERCHANT_MANAGER,
 }

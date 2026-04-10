@@ -2,6 +2,8 @@ package vn.com.routex.hub.user.service.application.service.otp;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
 import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationCommand;
@@ -22,7 +24,18 @@ public class OtpServiceImpl implements OtpService {
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @Override
+    @Transactional
     public OtpGenerationResult generateOtpAndSendMail(RequestContext context, UserEvent user, OtpPurpose otpPurpose) {
+        return doGenerateOtpAndSendMail(context, user, otpPurpose);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public OtpGenerationResult generateOtpAndSendMailRequiresNew(RequestContext context, UserEvent user, OtpPurpose otpPurpose) {
+        return doGenerateOtpAndSendMail(context, user, otpPurpose);
+    }
+
+    private OtpGenerationResult doGenerateOtpAndSendMail(RequestContext context, UserEvent user, OtpPurpose otpPurpose) {
         sLog.info("Generating OTP and sending Email");
         OtpGenerationResult otpResult = verificationService.createClientOtp(OtpGenerationCommand.builder()
                 .context(context)
@@ -41,8 +54,6 @@ public class OtpServiceImpl implements OtpService {
                 .expireMinutes(otpResult.expiresMinutes())
                 .purpose(otpPurpose)
                 .build());
-
-
         return otpResult;
     }
 }

@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 import vn.com.routex.hub.user.service.domain.membership.model.MembershipBadge;
 import vn.com.routex.hub.user.service.domain.user.model.Gender;
 import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
-import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
 
 import java.math.BigDecimal;

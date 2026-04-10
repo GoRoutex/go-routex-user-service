@@ -7,7 +7,6 @@ import vn.com.routex.hub.user.service.application.dto.authentication.ForgotPassw
 import vn.com.routex.hub.user.service.application.dto.authentication.LoginCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.LoginResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.LogoutCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.LogoutResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.RefreshTokenCommand;
 import vn.com.routex.hub.user.service.application.dto.authentication.RefreshTokenResult;
 import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationCommand;
