@@ -12,6 +12,7 @@ public class CustomerMembershipPersistenceMapper {
         return CustomerMembershipEntity
                 .builder()
                 .id(customerMembership.getId())
+                .customerId(customerMembership.getCustomerId())
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())
@@ -28,6 +29,7 @@ public class CustomerMembershipPersistenceMapper {
         return CustomerMembership
                 .builder()
                 .id(customerMembership.getId())
+                .customerId(customerMembership.getCustomerId())
                 .membershipTierId(customerMembership.getMembershipTierId())
                 .currentAvailablePoints(customerMembership.getCurrentAvailablePoints())
                 .totalPoints(customerMembership.getTotalPoints())

@@ -14,6 +14,7 @@ import vn.com.routex.hub.user.service.application.RequestAttributes;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -42,6 +43,18 @@ public class ApiFilter extends OncePerRequestFilter {
         if (!"POST".equalsIgnoreCase(request.getMethod())
                 && !"PUT".equalsIgnoreCase(request.getMethod())) {
 
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String contentType = request.getContentType();
+        boolean isJson = contentType != null && contentType.toLowerCase(Locale.ROOT).contains("application/json");
+        if (!isJson) {
+            // For non-JSON requests (e.g. multipart/form-data), we can't parse BaseRequest from body.
+            // Fall back to headers so exception handler can still return requestId/requestDateTime/channel.
+            request.setAttribute(RequestAttributes.REQUEST_ID, request.getHeader(RequestAttributes.REQUEST_ID));
+            request.setAttribute(RequestAttributes.REQUEST_DATE_TIME, request.getHeader(RequestAttributes.REQUEST_DATE_TIME));
+            request.setAttribute(RequestAttributes.CHANNEL, request.getHeader(RequestAttributes.CHANNEL));
             filterChain.doFilter(request, response);
             return;
         }

@@ -7,4 +7,10 @@ import vn.com.routex.hub.user.service.infrastructure.kafka.event.UserEvent;
 
 public interface OtpService {
     OtpGenerationResult generateOtpAndSendMail(RequestContext context, UserEvent user, OtpPurpose otpPurpose);
+
+    /**
+     * Generates OTP and sends email in a new transaction so it can still succeed even if
+     * the caller transaction is rolled back (e.g. re-registering while still VERIFYING).
+     */
+    OtpGenerationResult generateOtpAndSendMailRequiresNew(RequestContext context, UserEvent user, OtpPurpose otpPurpose);
 }

@@ -14,6 +14,7 @@ import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
 import vn.com.routex.hub.user.service.application.service.EmailService;
 import vn.com.routex.hub.user.service.domain.otp.model.OtpPurpose;
 import vn.com.routex.hub.user.service.infrastructure.persistence.config.SendGridMailProperties;
+import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class EmailServiceImpl implements EmailService {
 
     private final EmailTemplateService emailTemplateService;
     private final SendGridMailProperties properties;
+    private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @Override
     public void sendEmail(EmailMessageCommand command) {
@@ -34,6 +36,7 @@ public class EmailServiceImpl implements EmailService {
 
         String htmlBody = null;
 
+        sLog.info("Email Message: {}", command);
         if(OtpPurpose.REGISTER_VERIFY.equals(command.purpose())) {
             htmlBody = emailTemplateService.processTemplate(
                     "email/verification-code",
@@ -61,6 +64,7 @@ public class EmailServiceImpl implements EmailService {
 
             Response response = sendGrid.api(emailRequest);
 
+            sLog.info("Sending Email Response: {}", response);
             if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
                 throw new IllegalStateException(
                         "SendGrid send mail failed. Status=%s, body=%s"

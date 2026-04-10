@@ -3,7 +3,6 @@ package vn.com.routex.hub.user.service.application.service.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationCommand;
 import vn.com.routex.hub.user.service.application.dto.verification.OtpGenerationResult;
@@ -37,7 +36,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public OtpGenerationResult createClientOtp(OtpGenerationCommand command) {
         otpRepositoryPort.findLatestActiveOtp(command.userId(), command.purpose())
             .ifPresent(existing -> {
