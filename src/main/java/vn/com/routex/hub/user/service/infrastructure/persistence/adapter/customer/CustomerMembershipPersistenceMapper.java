@@ -1,7 +1,6 @@
 package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.customer;
 
 import lombok.experimental.UtilityClass;
-import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.customer.model.CustomerMembership;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerMembershipEntity;
 

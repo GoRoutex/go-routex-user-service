@@ -14,8 +14,8 @@ import vn.com.routex.hub.user.service.application.RequestAttributes;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Component
 @Slf4j

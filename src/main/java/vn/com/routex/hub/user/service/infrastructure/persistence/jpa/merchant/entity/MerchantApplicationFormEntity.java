@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import vn.com.routex.hub.user.service.domain.auditing.AbstractAuditingEntity;
 import vn.com.routex.hub.user.service.domain.merchant.ApplicationFormBankInfo;
 import vn.com.routex.hub.user.service.domain.merchant.ApplicationFormContact;
 import vn.com.routex.hub.user.service.domain.merchant.ApplicationFormOwner;

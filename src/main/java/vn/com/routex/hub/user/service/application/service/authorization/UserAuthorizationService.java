@@ -11,6 +11,8 @@ import vn.com.routex.hub.user.service.domain.role.port.UserRoleRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.merchant.repository.MerchantUserJpaRepository;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +36,15 @@ public class UserAuthorizationService {
                 .flatMap(role -> role.getAuthorities().stream())
                 .map(Authorities::getCode)
                 .collect(Collectors.toSet());
+    }
+
+    public Optional<String> getMerchantId(String userId) {
+        return merchantUserJpaRepository.findByUserIdAndStatus(userId, MerchantUserStatus.ACTIVE)
+                .stream()
+                .map(merchantUser -> merchantUser.getMerchantId())
+                .filter(Objects::nonNull)
+                .filter(merchantId -> !merchantId.isBlank())
+                .findFirst();
     }
 
     private Set<Roles> getUserRoles(String userId) {
