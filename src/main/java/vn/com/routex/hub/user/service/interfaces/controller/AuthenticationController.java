@@ -143,6 +143,7 @@ public class AuthenticationController {
                         .roles(result.roles())
                         .authorities(result.authorities())
                         .profileCompleted(result.profileCompleted())
+                        .avatarUrl(result.avatarUrl())
                         .build())
                 .build());
     }

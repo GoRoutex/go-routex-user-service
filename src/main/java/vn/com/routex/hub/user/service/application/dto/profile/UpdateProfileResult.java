@@ -8,6 +8,7 @@ public record UpdateProfileResult(
         String fullName,
         String email,
         String address,
-        String phoneNumber
+        String phoneNumber,
+        String avatarUrl
 ) {
 }

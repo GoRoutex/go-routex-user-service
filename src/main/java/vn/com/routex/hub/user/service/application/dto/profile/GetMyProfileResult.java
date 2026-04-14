@@ -8,6 +8,7 @@ import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 public record GetMyProfileResult(
@@ -23,10 +24,11 @@ public record GetMyProfileResult(
         Boolean phoneVerified,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt,
-        List<String> authorities,
+        Set<String> authorities,
         MyMembershipResult membership,
         MyMembershipStats stats,
-        MyCustomerProfileResult customer
+        MyCustomerProfileResult customer,
+        Set<String> roles
 ) {
     @Builder
     public record MyCustomerProfileResult(

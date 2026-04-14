@@ -32,7 +32,6 @@ public class RefreshTokenJpaEntity extends AbstractAuditingJpaEntity {
     @Column(name = "USER_ID", nullable = false)
     private String userId;
 
-    @Lob
     @Column(name = "TOKEN", nullable = false, columnDefinition = "TEXT")
     private String token;
 

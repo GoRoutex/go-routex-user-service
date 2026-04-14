@@ -114,6 +114,7 @@ public class UserInformationController {
                         .createdAt(result.createdAt())
                         .updatedAt(result.updatedAt())
                         .authorities(result.authorities())
+                        .roles(result.roles())
                         .customer(myProfile)
                         .build())
                 .membership(myMembership)
@@ -167,7 +168,9 @@ public class UserInformationController {
                         .fullName(request.getData().getFullName())
                         .email(request.getData().getEmail())
                         .phoneNumber(request.getData().getPhoneNumber())
-                        .address(request.getData().getAddress()).build());
+                        .address(request.getData().getAddress())
+                        .avatarUrl(request.getData().getAvatarUrl())
+                        .build());
 
         UpdateProfileResponse response = UpdateProfileResponse.builder()
                 .requestId(request.getRequestId())
@@ -182,7 +185,9 @@ public class UserInformationController {
                         .fullName(result.fullName())
                         .address(result.address())
                         .email(result.email())
-                        .phoneNumber(result.phoneNumber()).build())
+                        .phoneNumber(result.phoneNumber())
+                        .avatarUrl(result.avatarUrl())
+                        .build())
                 .build();
 
         sLog.info("[UPDATE-PROFILE] Update Profile Response: {}", response);

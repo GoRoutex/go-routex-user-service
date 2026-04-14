@@ -8,7 +8,9 @@ import vn.com.routex.hub.user.service.domain.role.model.Authorities;
 import vn.com.routex.hub.user.service.domain.role.model.Roles;
 import vn.com.routex.hub.user.service.domain.role.port.RoleRepositoryPort;
 import vn.com.routex.hub.user.service.domain.role.port.UserRoleRepositoryPort;
+import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.merchant.repository.MerchantUserJpaRepository;
+import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -16,6 +18,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.AUTHORIZATION_ERROR;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.ROLE_NOT_FOUND_ERROR;
 
 @RequiredArgsConstructor
 @Service
@@ -41,7 +46,7 @@ public class UserAuthorizationService {
     public Optional<String> getMerchantId(String userId) {
         return merchantUserJpaRepository.findByUserIdAndStatus(userId, MerchantUserStatus.ACTIVE)
                 .stream()
-                .map(merchantUser -> merchantUser.getMerchantId())
+                .map(merchantUser -> merchantUser != null ? merchantUser.getMerchantId() : null)
                 .filter(Objects::nonNull)
                 .filter(merchantId -> !merchantId.isBlank())
                 .findFirst();
@@ -50,13 +55,29 @@ public class UserAuthorizationService {
     private Set<Roles> getUserRoles(String userId) {
         Stream<Roles> defaultRoles = userRoleRepositoryPort.findByUserId(userId)
                 .stream()
-                .map(userRole -> roleRepositoryPort.findById(userRole.getId().getRoleId()).orElseThrow());
+                .map(userRole -> roleRepositoryPort.findById(userRole.getId().getRoleId())
+                        .orElseThrow(() -> missingRoleById(userRole.getId().getRoleId())));
 
         Stream<Roles> merchantRoles = merchantUserJpaRepository.findByUserIdAndStatus(userId, MerchantUserStatus.ACTIVE)
                 .stream()
-                .map(merchantUser -> roleRepositoryPort.findByCode(merchantUser.getRoleCode()).orElseThrow());
+                .map(merchantUser -> roleRepositoryPort.findByCode(merchantUser.getRoleCode())
+                        .orElseThrow(() -> missingRoleByCode(merchantUser.getRoleCode())));
 
         return Stream.concat(defaultRoles, merchantRoles)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private BusinessException missingRoleById(String roleId) {
+        return new BusinessException(ExceptionUtils.buildResultResponse(
+                AUTHORIZATION_ERROR,
+                String.format(ROLE_NOT_FOUND_ERROR, roleId)
+        ));
+    }
+
+    private BusinessException missingRoleByCode(String roleCode) {
+        return new BusinessException(ExceptionUtils.buildResultResponse(
+                AUTHORIZATION_ERROR,
+                String.format(ROLE_NOT_FOUND_ERROR, roleCode)
+        ));
     }
 }

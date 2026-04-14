@@ -12,7 +12,8 @@ public record LoginResult(
         String email,
         Set<String> roles,
         Set<String> authorities,
-        Boolean profileCompleted
+        Boolean profileCompleted,
+        String avatarUrl
 ) {
 }
 

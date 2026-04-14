@@ -35,6 +35,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.CUSTOMER_NOT_FOUND_MESSAGE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.DUPLICATE_ERROR;
@@ -119,7 +120,10 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .map(next -> next.getMinPoints().subtract(customerMemberShipView.tripPoints()).max(BigDecimal.ZERO))
                 .orElse(BigDecimal.ZERO);
 
-        List<String> authorities = new ArrayList<>(userAuthorizationService.getAuthorities(command.userId()));
+
+        Set<String> roles = userAuthorizationService.getRoles(command.userId());
+        Set<String> authorities = userAuthorizationService.getAuthorities(command.userId());
+
 
         MyMembershipResult myMembership = MyMembershipResult.builder()
                 .currentPoint(customerMemberShipView.tripPoints())
@@ -164,6 +168,7 @@ public class UserProfileServiceImpl implements UserProfileService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .authorities(authorities)
+                .roles(roles)
                 .membership(myMembership)
                 .stats(myMembershipStats)
                 .customer(myCustomer)
@@ -269,14 +274,19 @@ public class UserProfileServiceImpl implements UserProfileService {
         Optional.ofNullable(command.phoneNumber())
                 .ifPresent(user::setPhoneNumber);
 
+        Optional.ofNullable(command.avatarUrl())
+                .ifPresent(user::setAvatarUrl);
+
         customerRepositoryPort.save(customer);
         userRepositoryPort.save(user);
 
         return UpdateProfileResult.builder()
+                .userId(user.getId())
                 .fullName(command.fullName())
                 .phoneNumber(command.phoneNumber())
                 .address(command.address())
                 .email(command.email())
+                .avatarUrl(user.getAvatarUrl())
                 .build();
     }
 }
