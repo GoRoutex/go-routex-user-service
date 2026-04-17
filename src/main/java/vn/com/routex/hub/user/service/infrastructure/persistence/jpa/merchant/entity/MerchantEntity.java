@@ -14,7 +14,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import vn.com.routex.hub.user.service.domain.auditing.AbstractAuditingEntity;
 import vn.com.routex.hub.user.service.domain.merchant.MerchantStatus;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.shared.entity.AbstractAuditingJpaEntity;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

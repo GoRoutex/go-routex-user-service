@@ -13,7 +13,6 @@ import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Getter

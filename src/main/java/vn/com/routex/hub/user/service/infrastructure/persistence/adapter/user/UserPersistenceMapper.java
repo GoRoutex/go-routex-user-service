@@ -36,6 +36,9 @@ public class UserPersistenceMapper {
     }
 
     public User toDomain(UserEntity userEntity) {
+        if(userEntity == null) {
+            return null;
+        }
         return User.builder()
                 .id(userEntity.getId())
                 .passwordHash(userEntity.getPasswordHash())
