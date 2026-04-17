@@ -59,14 +59,13 @@ public class ApiFilter extends OncePerRequestFilter {
             return;
         }
 
+        CachedHttpServletRequestWrapper wrappedRequest =
+                new CachedHttpServletRequestWrapper(request);
+
+        ContentCachingResponseWrapper wrappedResponse =
+                new ContentCachingResponseWrapper(response);
+
         try {
-
-            CachedHttpServletRequestWrapper wrappedRequest =
-                    new CachedHttpServletRequestWrapper(request);
-
-            ContentCachingResponseWrapper wrappedResponse =
-                    new ContentCachingResponseWrapper(response);
-
             String body = new String(
                     wrappedRequest.getInputStream().readAllBytes(),
                     StandardCharsets.UTF_8
@@ -77,25 +76,24 @@ public class ApiFilter extends OncePerRequestFilter {
             request.setAttribute(RequestAttributes.REQUEST_ID, apiRequest.getRequestId());
             request.setAttribute(RequestAttributes.REQUEST_DATE_TIME, apiRequest.getRequestDateTime());
             request.setAttribute(RequestAttributes.CHANNEL, apiRequest.getChannel());
-
-            filterChain.doFilter(wrappedRequest, wrappedResponse);
-
-            String responseBody = new String(
-                    wrappedResponse.getContentAsByteArray(),
-                    StandardCharsets.UTF_8
-            );
-
-            log.info("Response: {}", responseBody);
-
-            wrappedResponse.copyBodyToResponse();
-
         } catch (Exception ex) {
-
             log.error("Invalid request: {}", ex.getMessage());
 
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().write("Invalid Request");
             response.getWriter().flush();
+            return;
         }
+
+        filterChain.doFilter(wrappedRequest, wrappedResponse);
+
+        String responseBody = new String(
+                wrappedResponse.getContentAsByteArray(),
+                StandardCharsets.UTF_8
+        );
+
+        log.info("Response: {}", responseBody);
+
+        wrappedResponse.copyBodyToResponse();
     }
 }

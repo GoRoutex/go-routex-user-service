@@ -325,6 +325,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .email(user.getEmail())
                 .authorities(authorities)
                 .profileCompleted(user.getProfileCompleted())
+                .avatarUrl(user.getAvatarUrl())
                 .build();
     }
 

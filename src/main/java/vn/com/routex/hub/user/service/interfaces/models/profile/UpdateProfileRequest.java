@@ -45,5 +45,6 @@ public class UpdateProfileRequest extends BaseRequest {
         private String email;
         private String phoneNumber;
         private String address;
+        private String avatarUrl;
     }
 }

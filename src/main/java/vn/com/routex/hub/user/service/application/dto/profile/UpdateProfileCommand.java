@@ -10,6 +10,7 @@ public record UpdateProfileCommand(
         String fullName,
         String email,
         String phoneNumber,
-        String address
+        String address,
+        String avatarUrl
 ) {
 }

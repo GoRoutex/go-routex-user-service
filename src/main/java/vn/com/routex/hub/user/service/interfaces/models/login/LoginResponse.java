@@ -24,6 +24,7 @@ public class LoginResponse extends BaseResponse<LoginResponse.LoginResponseData>
         private String email;
         private Set<String> roles;
         private Set<String> authorities;
+        private String avatarUrl;
         private Boolean profileCompleted;
     }
 }

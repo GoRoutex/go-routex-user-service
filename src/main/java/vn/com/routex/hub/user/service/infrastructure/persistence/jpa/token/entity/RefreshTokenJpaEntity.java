@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +31,6 @@ public class RefreshTokenJpaEntity extends AbstractAuditingJpaEntity {
     @Column(name = "USER_ID", nullable = false)
     private String userId;
 
-    @Lob
     @Column(name = "TOKEN", nullable = false, columnDefinition = "TEXT")
     private String token;
 

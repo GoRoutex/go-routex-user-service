@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
 import vn.com.routex.hub.user.service.domain.user.model.User;
+import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 
 import javax.crypto.SecretKey;
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class JwtService {
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
     private final UserAuthorizationService userAuthorizationService;
+    private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     public JwtService(JwtProperties jwtProperties, UserAuthorizationService userAuthorizationService) {
         this.jwtProperties = jwtProperties;
@@ -45,6 +47,9 @@ public class JwtService {
         Set<String> authorities = userAuthorizationService.getAuthorities(user.getId());
         String merchantId = userAuthorizationService.getMerchantId(user.getId()).orElse(null);
 
+
+
+        sLog.info("[MERCHANT] Merchant Info : {}", merchantId);
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");
         claims.put("email", user.getEmail());
