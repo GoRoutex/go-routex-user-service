@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRoleJpaId implements Serializable {
+public class UserRoleEntityId implements Serializable {
 
     private String userId;
     private String roleId;

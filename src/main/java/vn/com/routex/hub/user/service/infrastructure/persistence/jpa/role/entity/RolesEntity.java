@@ -2,7 +2,11 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entit
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,17 +15,20 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.shared.entity.AbstractAuditingJpaEntity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "AUTHORITIES")
-public class AuthoritiesJpaEntity extends AbstractAuditingJpaEntity {
+@Table(name = "ROLES")
+public class RolesEntity extends AbstractAuditingJpaEntity {
 
     @Id
-    private int id;
+    private String id;
 
     @Column(name = "CODE", nullable = false, unique = true)
     private String code;
@@ -34,4 +41,12 @@ public class AuthoritiesJpaEntity extends AbstractAuditingJpaEntity {
 
     @Column(name = "ENABLED")
     private Boolean enabled;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "role_authorities",
+            joinColumns = @JoinColumn(name = "ROLE_ID"),
+            inverseJoinColumns = @JoinColumn(name = "authorities_id")
+    )
+    private Set<AuthoritiesEntity> authorities = new HashSet<>();
 }

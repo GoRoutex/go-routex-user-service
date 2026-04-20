@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.role.model.Roles;
 import vn.com.routex.hub.user.service.domain.role.port.RoleRepositoryPort;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.repository.RolesJpaRepository;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.repository.RolesEntityRepository;
 
 import java.util.Optional;
 
@@ -12,16 +12,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RoleRepositoryAdapter implements RoleRepositoryPort {
 
-    private final RolesJpaRepository rolesJpaRepository;
+    private final RolesEntityRepository rolesEntityRepository;
     private final RolePersistenceMapper rolePersistenceMapper;
 
     @Override
     public Optional<Roles> findById(String id) {
-        return rolesJpaRepository.findById(id).map(rolePersistenceMapper::toDomain);
+        return rolesEntityRepository.findById(id).map(rolePersistenceMapper::toDomain);
     }
 
     @Override
     public Optional<Roles> findByCode(String code) {
-        return rolesJpaRepository.findByCode(code).map(rolePersistenceMapper::toDomain);
+        return rolesEntityRepository.findByCode(code).map(rolePersistenceMapper::toDomain);
     }
 }

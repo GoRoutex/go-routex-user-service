@@ -155,10 +155,8 @@ public class UserInformationController {
                 .build());
     }
 
-
     @PostMapping(PROFILE_PATH + UPDATE_PATH)
     public ResponseEntity<UpdateProfileResponse> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-
 
         sLog.info("[UPDATE-PROFILE] Update Profile Request: {}", request);
         UpdateProfileResult result = userProfileService.updateProfile(

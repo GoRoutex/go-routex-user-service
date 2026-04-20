@@ -9,7 +9,7 @@ import vn.com.routex.hub.user.service.domain.role.model.Roles;
 import vn.com.routex.hub.user.service.domain.role.port.RoleRepositoryPort;
 import vn.com.routex.hub.user.service.domain.role.port.UserRoleRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.merchant.repository.MerchantUserJpaRepository;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.merchant.repository.MerchantUserEntityRepository;
 import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 
 import java.util.LinkedHashSet;
@@ -28,7 +28,7 @@ public class UserAuthorizationService {
 
     private final UserRoleRepositoryPort userRoleRepositoryPort;
     private final RoleRepositoryPort roleRepositoryPort;
-    private final MerchantUserJpaRepository merchantUserJpaRepository;
+    private final MerchantUserEntityRepository merchantUserJpaRepository;
 
     public Set<String> getRoles(String userId) {
         return getUserRoles(userId).stream()
