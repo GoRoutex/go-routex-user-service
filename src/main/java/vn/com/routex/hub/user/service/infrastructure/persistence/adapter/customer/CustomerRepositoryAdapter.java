@@ -6,6 +6,7 @@ import vn.com.routex.hub.user.service.domain.customer.model.Customer;
 import vn.com.routex.hub.user.service.domain.customer.port.CustomerRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.repository.CustomerEntityRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -18,6 +19,17 @@ public class CustomerRepositoryAdapter implements CustomerRepositoryPort {
     @Override
     public Optional<Customer> findByUserId(String userId) {
         return customerEntityRepository.findByUserId(userId).map(customerPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public List<Customer> findByUserIds(List<String> userIds) {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+
+        return customerEntityRepository.findByUserIdIn(userIds).stream()
+                .map(customerPersistenceMapper::toDomain)
+                .toList();
     }
 
     @Override
