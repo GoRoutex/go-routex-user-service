@@ -6,7 +6,7 @@ import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.merchant.en
 
 import java.util.List;
 
-public interface MerchantUserJpaRepository extends JpaRepository<MerchantUserEntity, String> {
+public interface MerchantUserEntityRepository extends JpaRepository<MerchantUserEntity, String> {
 
     List<MerchantUserEntity> findByUserIdAndStatus(String userId, MerchantUserStatus status);
 }

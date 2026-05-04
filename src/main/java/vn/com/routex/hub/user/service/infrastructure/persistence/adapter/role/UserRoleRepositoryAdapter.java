@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.role.model.UserRoles;
 import vn.com.routex.hub.user.service.domain.role.port.UserRoleRepositoryPort;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.repository.UserRoleJpaRepository;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.repository.UserRoleEntityRepository;
 
 import java.util.List;
 
@@ -12,17 +12,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserRoleRepositoryAdapter implements UserRoleRepositoryPort {
 
-    private final UserRoleJpaRepository userRoleJpaRepository;
+    private final UserRoleEntityRepository userRoleEntityRepository;
     private final RolePersistenceMapper rolePersistenceMapper;
 
     @Override
     public UserRoles save(UserRoles userRoles) {
-        return rolePersistenceMapper.toDomain(userRoleJpaRepository.save(rolePersistenceMapper.toJpaEntity(userRoles)));
+        return rolePersistenceMapper.toDomain(userRoleEntityRepository.save(rolePersistenceMapper.toJpaEntity(userRoles)));
     }
 
     @Override
     public List<UserRoles> findByUserId(String userId) {
-        return userRoleJpaRepository.findByIdUserId(userId).stream()
+        return userRoleEntityRepository.findByIdUserId(userId).stream()
                 .map(rolePersistenceMapper::toDomain)
                 .toList();
     }

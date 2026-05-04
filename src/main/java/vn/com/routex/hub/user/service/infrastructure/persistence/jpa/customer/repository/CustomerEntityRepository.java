@@ -3,8 +3,10 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.r
 import org.springframework.data.jpa.repository.JpaRepository;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.entity.CustomerEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CustomerEntityRepository extends JpaRepository<CustomerEntity, String> {
     Optional<CustomerEntity> findByUserId(String userId);
+    List<CustomerEntity> findByUserIdIn(List<String> userIds);
 }

@@ -19,10 +19,10 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRolesJpaEntity {
+public class UserRolesEntity {
 
     @EmbeddedId
-    private UserRoleJpaId id;
+    private UserRoleEntityId id;
 
     @Column(name = "ASSIGNED_AT")
     private OffsetDateTime assignedAt;

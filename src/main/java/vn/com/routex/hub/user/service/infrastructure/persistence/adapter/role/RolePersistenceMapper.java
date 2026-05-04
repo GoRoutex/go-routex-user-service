@@ -5,10 +5,10 @@ import vn.com.routex.hub.user.service.domain.role.model.Authorities;
 import vn.com.routex.hub.user.service.domain.role.model.Roles;
 import vn.com.routex.hub.user.service.domain.role.model.UserRoleId;
 import vn.com.routex.hub.user.service.domain.role.model.UserRoles;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.AuthoritiesJpaEntity;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.RolesJpaEntity;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.UserRoleJpaId;
-import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.UserRolesJpaEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.AuthoritiesEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.RolesEntity;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.UserRoleEntityId;
+import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.role.entity.UserRolesEntity;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,52 +16,52 @@ import java.util.stream.Collectors;
 @Component
 public class RolePersistenceMapper {
 
-    public Roles toDomain(RolesJpaEntity rolesJpaEntity) {
-        Set<Authorities> authorities = rolesJpaEntity.getAuthorities().stream()
+    public Roles toDomain(RolesEntity rolesEntity) {
+        Set<Authorities> authorities = rolesEntity.getAuthorities().stream()
                 .map(this::toDomain)
                 .collect(Collectors.toSet());
 
         return Roles.builder()
-                .id(rolesJpaEntity.getId())
-                .code(rolesJpaEntity.getCode())
-                .name(rolesJpaEntity.getName())
-                .description(rolesJpaEntity.getDescription())
-                .enabled(rolesJpaEntity.getEnabled())
+                .id(rolesEntity.getId())
+                .code(rolesEntity.getCode())
+                .name(rolesEntity.getName())
+                .description(rolesEntity.getDescription())
+                .enabled(rolesEntity.getEnabled())
                 .authorities(authorities)
-                .createdAt(rolesJpaEntity.getCreatedAt())
-                .createdBy(rolesJpaEntity.getCreatedBy())
-                .updatedAt(rolesJpaEntity.getUpdatedAt())
-                .updatedBy(rolesJpaEntity.getUpdatedBy())
+                .createdAt(rolesEntity.getCreatedAt())
+                .createdBy(rolesEntity.getCreatedBy())
+                .updatedAt(rolesEntity.getUpdatedAt())
+                .updatedBy(rolesEntity.getUpdatedBy())
                 .build();
     }
 
-    public Authorities toDomain(AuthoritiesJpaEntity authoritiesJpaEntity) {
+    public Authorities toDomain(AuthoritiesEntity authoritiesEntity) {
         return Authorities.builder()
-                .id(authoritiesJpaEntity.getId())
-                .code(authoritiesJpaEntity.getCode())
-                .name(authoritiesJpaEntity.getName())
-                .description(authoritiesJpaEntity.getDescription())
-                .enabled(authoritiesJpaEntity.getEnabled())
-                .createdAt(authoritiesJpaEntity.getCreatedAt())
-                .createdBy(authoritiesJpaEntity.getCreatedBy())
-                .updatedAt(authoritiesJpaEntity.getUpdatedAt())
-                .updatedBy(authoritiesJpaEntity.getUpdatedBy())
+                .id(authoritiesEntity.getId())
+                .code(authoritiesEntity.getCode())
+                .name(authoritiesEntity.getName())
+                .description(authoritiesEntity.getDescription())
+                .enabled(authoritiesEntity.getEnabled())
+                .createdAt(authoritiesEntity.getCreatedAt())
+                .createdBy(authoritiesEntity.getCreatedBy())
+                .updatedAt(authoritiesEntity.getUpdatedAt())
+                .updatedBy(authoritiesEntity.getUpdatedBy())
                 .build();
     }
 
-    public UserRoles toDomain(UserRolesJpaEntity userRolesJpaEntity) {
+    public UserRoles toDomain(UserRolesEntity userRolesEntity) {
         return UserRoles.builder()
                 .id(UserRoleId.builder()
-                        .userId(userRolesJpaEntity.getId().getUserId())
-                        .roleId(userRolesJpaEntity.getId().getRoleId())
+                        .userId(userRolesEntity.getId().getUserId())
+                        .roleId(userRolesEntity.getId().getRoleId())
                         .build())
-                .assignedAt(userRolesJpaEntity.getAssignedAt())
+                .assignedAt(userRolesEntity.getAssignedAt())
                 .build();
     }
 
-    public UserRolesJpaEntity toJpaEntity(UserRoles userRoles) {
-        return UserRolesJpaEntity.builder()
-                .id(UserRoleJpaId.builder()
+    public UserRolesEntity toJpaEntity(UserRoles userRoles) {
+        return UserRolesEntity.builder()
+                .id(UserRoleEntityId.builder()
                         .userId(userRoles.getId().getUserId())
                         .roleId(userRoles.getId().getRoleId())
                         .build())

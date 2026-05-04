@@ -176,6 +176,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .totalPoints(BigDecimal.ZERO)
                 .promotedAt(OffsetDateTime.now())
                 .status(CustomerMembershipStatus.ACTIVE)
+                .createdAt(OffsetDateTime.now())
                 .build();
 
         userRepositoryPort.save(registeredUser);
