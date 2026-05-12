@@ -22,6 +22,15 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "vn.com.*"
+        
+    events:
+      ticket-issued: "routex.ticket.issued"
+
+    topics:
+      booking: "route.bookings.event"
+
+    group-id:
+      membership: "user-service-membership"
 
   datasource:
     driver-class-name: org.postgresql.Driver

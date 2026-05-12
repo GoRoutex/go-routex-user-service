@@ -22,6 +22,11 @@ public class CustomerRepositoryAdapter implements CustomerRepositoryPort {
     }
 
     @Override
+    public Optional<Customer> findById(String id) {
+        return customerEntityRepository.findById(id).map(customerPersistenceMapper::toDomain);
+    }
+
+    @Override
     public List<Customer> findByUserIds(List<String> userIds) {
         if (userIds == null || userIds.isEmpty()) {
             return List.of();

@@ -33,7 +33,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API_PATH + API_VERSION + INTERNAL_PATH + USER_SERVICE + CUSTOMERS_PATH)
+@RequestMapping(API_PATH + API_VERSION + USER_SERVICE + INTERNAL_PATH + CUSTOMERS_PATH)
 public class InternalCustomerAdminController {
 
     private final InternalCustomerAdminService internalCustomerAdminService;
