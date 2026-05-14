@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
 import vn.com.routex.hub.user.service.application.service.internal.InternalCustomerAdminService;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
+import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.infrastructure.utils.ApiRequestUtils;
 import vn.com.routex.hub.user.service.interfaces.model.internal.customer.InternalCustomerResponses;
 import vn.com.routex.hub.user.service.interfaces.model.internal.customer.InternalFetchCustomersByUserIdsRequest;
@@ -37,6 +38,7 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 public class InternalCustomerAdminController {
 
     private final InternalCustomerAdminService internalCustomerAdminService;
+    private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @GetMapping(DETAIL_BY_USER_ID)
     public ResponseEntity<BaseResponse<InternalCustomerResponses.CustomerData>> fetchCustomerByUserId(

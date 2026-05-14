@@ -7,20 +7,21 @@ import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.en
 @Component
 public class CustomerPersistenceMapper {
 
-    public CustomerEntity toJpaEntity(Customer customer) {
+    public CustomerEntity toEntity(Customer customer) {
         return CustomerEntity.builder()
                 .id(customer.getId())
                 .userId(customer.getUserId())
                 .status(customer.getStatus())
                 .fullName(customer.getFullName())
-                .createdAt(customer.getCreatedAt())
-                .createdBy(customer.getCreatedBy())
                 .totalTrips(customer.getTotalTrips())
                 .totalSpent(customer.getTotalSpent())
-                .updatedAt(customer.getUpdatedAt())
-                .updatedBy(customer.getUpdatedBy())
+                .tripPoints(customer.getTripPoints())
                 .lastBookingAt(customer.getLastBookingAt())
                 .lastTripAt(customer.getLastTripAt())
+                .createdAt(customer.getCreatedAt())
+                .createdBy(customer.getCreatedBy())
+                .updatedAt(customer.getUpdatedAt())
+                .updatedBy(customer.getUpdatedBy())
                 .build();
     }
 
@@ -30,12 +31,13 @@ public class CustomerPersistenceMapper {
                 .userId(customerEntity.getUserId())
                 .status(customerEntity.getStatus())
                 .fullName(customerEntity.getFullName())
+                .tripPoints(customerEntity.getTripPoints())
+                .lastBookingAt(customerEntity.getLastBookingAt())
+                .lastTripAt(customerEntity.getLastTripAt())
                 .createdAt(customerEntity.getCreatedAt())
                 .createdBy(customerEntity.getCreatedBy())
                 .updatedAt(customerEntity.getUpdatedAt())
                 .updatedBy(customerEntity.getUpdatedBy())
-                .lastBookingAt(customerEntity.getLastBookingAt())
-                .lastTripAt(customerEntity.getLastTripAt())
                 .build();
     }
 }

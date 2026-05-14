@@ -40,7 +40,7 @@ public class CustomerRepositoryAdapter implements CustomerRepositoryPort {
     @Override
     public Customer save(Customer customer) {
         return customerPersistenceMapper.toDomain(
-                customerEntityRepository.save(customerPersistenceMapper.toJpaEntity(customer))
+                customerEntityRepository.save(customerPersistenceMapper.toEntity(customer))
         );
     }
 }

@@ -47,8 +47,6 @@ public class JwtService {
         Set<String> authorities = userAuthorizationService.getAuthorities(user.getId());
         String merchantId = userAuthorizationService.getMerchantId(user.getId()).orElse(null);
 
-
-
         sLog.info("[MERCHANT] Merchant Info : {}", merchantId);
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "access");

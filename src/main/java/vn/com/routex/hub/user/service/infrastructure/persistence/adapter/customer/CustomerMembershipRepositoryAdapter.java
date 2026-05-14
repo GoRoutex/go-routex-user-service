@@ -21,6 +21,6 @@ public class CustomerMembershipRepositoryAdapter implements CustomerMembershipRe
 
     @Override
     public CustomerMembership save(CustomerMembership customerMembership) {
-        return CustomerMembershipPersistenceMapper.toDomain(customerMembershipEntityRepository.save(CustomerMembershipPersistenceMapper.toJpaEntity(customerMembership)));
+        return CustomerMembershipPersistenceMapper.toDomain(customerMembershipEntityRepository.save(CustomerMembershipPersistenceMapper.toEntity(customerMembership)));
     }
 }

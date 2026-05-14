@@ -7,7 +7,7 @@ import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.otp.entity.
 @Component
 public class OtpPersistenceMapper {
 
-    public OtpJpaEntity toJpaEntity(Otp otp) {
+    public OtpJpaEntity toEntity(Otp otp) {
         return OtpJpaEntity.builder()
                 .id(otp.getId())
                 .userId(otp.getUserId())
