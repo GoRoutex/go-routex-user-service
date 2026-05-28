@@ -7,7 +7,7 @@ import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.token.entit
 @Component
 public class RefreshTokenPersistenceMapper {
 
-    public RefreshTokenJpaEntity toJpaEntity(RefreshToken refreshToken) {
+    public RefreshTokenJpaEntity toEntity(RefreshToken refreshToken) {
         return RefreshTokenJpaEntity.builder()
                 .id(refreshToken.getId())
                 .userId(refreshToken.getUserId())

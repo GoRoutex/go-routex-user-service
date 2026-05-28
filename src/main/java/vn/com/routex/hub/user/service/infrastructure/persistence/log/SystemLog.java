@@ -56,4 +56,22 @@ public class SystemLog {
             logger.info(message, processArgs(args));
         }
     }
+
+    public void error(String message, Object... args) {
+        if (logger.isErrorEnabled()) {
+            logger.error(message, processArgs(args));
+        }
+    }
+
+    public void warn(String message, Object... args) {
+        if (logger.isWarnEnabled()) {
+            logger.warn(message, processArgs(args));
+        }
+    }
+
+    public void debug(String message, Object... args) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(message, processArgs(args));
+        }
+    }
 }

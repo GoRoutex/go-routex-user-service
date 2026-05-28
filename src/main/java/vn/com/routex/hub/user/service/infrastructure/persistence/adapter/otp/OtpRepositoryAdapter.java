@@ -28,6 +28,6 @@ public class OtpRepositoryAdapter implements OtpRepositoryPort {
 
     @Override
     public Otp save(Otp otp) {
-        return otpPersistenceMapper.toDomain(otpJpaRepository.save(otpPersistenceMapper.toJpaEntity(otp)));
+        return otpPersistenceMapper.toDomain(otpJpaRepository.save(otpPersistenceMapper.toEntity(otp)));
     }
 }

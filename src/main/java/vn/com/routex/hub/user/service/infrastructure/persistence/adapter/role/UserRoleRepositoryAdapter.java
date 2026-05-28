@@ -17,7 +17,7 @@ public class UserRoleRepositoryAdapter implements UserRoleRepositoryPort {
 
     @Override
     public UserRoles save(UserRoles userRoles) {
-        return rolePersistenceMapper.toDomain(userRoleEntityRepository.save(rolePersistenceMapper.toJpaEntity(userRoles)));
+        return rolePersistenceMapper.toDomain(userRoleEntityRepository.save(rolePersistenceMapper.toEntity(userRoles)));
     }
 
     @Override

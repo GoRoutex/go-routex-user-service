@@ -1,86 +1,74 @@
 package vn.com.routex.hub.user.service.application.service.email;
 
-import com.sendgrid.Method;
-import com.sendgrid.Request;
-import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
-import com.sendgrid.helpers.mail.Mail;
-import com.sendgrid.helpers.mail.objects.Content;
-import com.sendgrid.helpers.mail.objects.Email;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import vn.com.routex.hub.user.service.application.dto.email.EmailMessageCommand;
+import vn.com.routex.hub.user.service.application.command.email.EmailMessageCommand;
 import vn.com.routex.hub.user.service.application.service.EmailService;
 import vn.com.routex.hub.user.service.domain.otp.model.OtpPurpose;
-import vn.com.routex.hub.user.service.infrastructure.persistence.config.SendGridMailProperties;
+import vn.com.routex.hub.user.service.infrastructure.kafka.event.EmailNotificationEvent;
+import vn.com.routex.hub.user.service.infrastructure.kafka.event.KafkaEventMessage;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
+import vn.com.routex.hub.user.service.infrastructure.utils.JsonUtils;
 
-import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
 
-    private final EmailTemplateService emailTemplateService;
-    private final SendGridMailProperties properties;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
+
+    @Value("${spring.kafka.events.notification-email}")
+    private String emailEventName;
 
     @Override
     public void sendEmail(EmailMessageCommand command) {
+        sLog.info("[EMAIL-PUBLISHER] Preparing asynchronous email event for toEmail={}, purpose={}", command.toEmail(), command.purpose());
 
-        Map<String, Object> variables = getStringObjectMap(command);
-
-        String htmlBody = null;
-
-        sLog.info("Email Message: {}", command);
-        if(OtpPurpose.REGISTER_VERIFY.equals(command.purpose())) {
-            htmlBody = emailTemplateService.processTemplate(
-                    "email/verification-code",
-                    variables
-            );
-        } else {
-            htmlBody = emailTemplateService.processTemplate(
-                    "email/forgot-password",
-                    variables
-            );
-        }
-
-        Email from = new Email(properties.getFromEmail(), properties.getFromName());
-        Email to = new Email(command.toEmail());
-        Content content = new Content("text/html", htmlBody);
-        Mail mail = new Mail(from, properties.getVerifySubject(), to, content);
-
-        SendGrid sendGrid = new SendGrid(properties.getApiKey());
-        Request emailRequest = new Request();
-
-        try {
-            emailRequest.setMethod(Method.POST);
-            emailRequest.setEndpoint("mail/send");
-            emailRequest.setBody(mail.build());
-
-            Response response = sendGrid.api(emailRequest);
-
-            sLog.info("Sending Email Response: {}", response);
-            if (response.getStatusCode() < 200 || response.getStatusCode() >= 300) {
-                throw new IllegalStateException(
-                        "SendGrid send mail failed. Status=%s, body=%s"
-                                .formatted(response.getStatusCode(), response.getBody())
-                );
-            }
-        } catch (IOException ex) {
-            throw new IllegalStateException("Failed to send email via SendGrid", ex);
-        }
-    }
-
-    private @NonNull Map<String, Object> getStringObjectMap(EmailMessageCommand command) {
         Map<String, Object> variables = new HashMap<>();
         variables.put("fullName", (command.fullName() == null || command.fullName().isBlank()) ? "bạn" : command.fullName());
         variables.put("otpCode", command.verificationCode());
         variables.put("expiredMinutes", command.expireMinutes());
-        return variables;
+
+        String templateName;
+        String subject;
+        if (OtpPurpose.REGISTER_VERIFY.equals(command.purpose())) {
+            templateName = "email/verification-code";
+            subject = "Go Routex - Xác thực tài khoản";
+        } else {
+            templateName = "email/forgot-password";
+            subject = "Go Routex - Đặt lại mật khẩu";
+        }
+
+        EmailNotificationEvent emailEvent = EmailNotificationEvent.builder()
+                .toEmail(command.toEmail())
+                .subject(subject)
+                .templateName(templateName)
+                .variables(variables)
+                .build();
+
+        KafkaEventMessage<EmailNotificationEvent> message = KafkaEventMessage.<EmailNotificationEvent>builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventName(emailEventName)
+                .aggregateId(command.toEmail())
+                .occurredAt(OffsetDateTime.now())
+                .data(emailEvent)
+                .build();
+
+        try {
+            String payload = JsonUtils.parseToJsonStr(message);
+            sLog.info("[EMAIL-PUBLISHER] Publishing event payload to topic routex.notification.email");
+            kafkaTemplate.send(emailEventName, command.toEmail(), payload);
+            sLog.info("[EMAIL-PUBLISHER] Successfully published email notification event to Kafka");
+        } catch (Exception e) {
+            sLog.error("[EMAIL-PUBLISHER] Failed to publish email event to Kafka", e);
+            throw new IllegalStateException("Failed to publish email notification event", e);
+        }
     }
 }

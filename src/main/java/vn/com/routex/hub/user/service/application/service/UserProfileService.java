@@ -1,13 +1,13 @@
 package vn.com.routex.hub.user.service.application.service;
 
-import vn.com.routex.hub.user.service.application.dto.profile.CompleteProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.CompleteProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.CompleteProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.CompleteProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.GetMyProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.GetMyProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.GetUserProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.GetUserProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileResult;
 
 public interface UserProfileService {
 

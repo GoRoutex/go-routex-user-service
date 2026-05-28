@@ -13,16 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
-import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
-import vn.com.routex.hub.user.service.application.dto.profile.CompleteProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.CompleteProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.GetMyProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.GetUserProfileResult;
-import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileCommand;
-import vn.com.routex.hub.user.service.application.dto.profile.UpdateProfileResult;
+import vn.com.routex.hub.user.service.application.command.common.RequestContext;
+import vn.com.routex.hub.user.service.application.command.profile.CompleteProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.CompleteProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.GetMyProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.GetMyProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.GetUserProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.GetUserProfileResult;
+import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileCommand;
+import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileResult;
 import vn.com.routex.hub.user.service.application.service.UserProfileService;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
@@ -57,7 +56,7 @@ public class UserInformationController {
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @InitBinder
-    public void initBinder(WebDataBinder webDataBinder, WebRequest webRequest) {
+    public void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.setDisallowedFields("requestId", "requestDateTime", "channel", "data");
     }
 

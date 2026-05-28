@@ -22,6 +22,16 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "vn.com.*"
+        
+    events:
+      ticket-issued: "routex.ticket.issued"
+      notification-email: "routex.notification.email"
+
+    topics:
+      booking: "route.bookings.event"
+
+    group-id:
+      membership: "user-service-membership"
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -57,33 +67,27 @@ management:
 server:
   port: ${SERVER_PORT:8081}
 
+grpc:
+  server:
+    port: ${GRPC_SERVER_PORT:9091}
+  client:
+    merchantService:
+      address: ${MERCHANT_SERVICE_GRPC_ADDRESS:static://localhost:9090}
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
 client:
   verify:
     url: ${CLIENT_URL:http://localhost:8080/}
 
 identity:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:CZZRadv0Xe8z3stWFWYdtiJ2E86gUgJvFEfbCYFgJhQ}
     access-token-expiration-minutes: 60
     refresh-token-expiration-days: 7
     issuer: ${JWT_ISSUER:user-service}
 
-notification:
-  email:
-    provider: sendgrid
-    sendgrid:
-      baseUrl: ${BASE_URL:http://localhost:5173/}
-      api-key: ${SENDGRID_API_KEY}
-      from-email: ${SENDGRID_FROM_EMAIL:simon@routex-go.com}
-      from-name: ${SENDGRID_FROM_NAME:Go-Routex}
-      verify-subject: ${SENDGRID_VERIFY_SUBJECT:Registration Form - Verify your Email}
-
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: HTML
-    encoding: UTF-8
-    cache: false
 
 logging:
   level:
