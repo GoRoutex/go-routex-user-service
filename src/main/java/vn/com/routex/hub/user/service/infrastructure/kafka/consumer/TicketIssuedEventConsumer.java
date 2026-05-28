@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+import vn.com.routex.hub.user.service.application.service.internal.InternalCustomerAdminService;
 import vn.com.routex.hub.user.service.infrastructure.kafka.event.DomainEvent;
 import vn.com.routex.hub.user.service.infrastructure.kafka.event.TicketIssuedEvent;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.infrastructure.utils.JsonUtils;
-import vn.com.routex.hub.user.service.application.service.internal.InternalCustomerAdminService;
 
 @Component
 @RequiredArgsConstructor

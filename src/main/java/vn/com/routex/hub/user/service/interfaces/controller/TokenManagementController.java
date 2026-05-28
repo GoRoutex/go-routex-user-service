@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
-import vn.com.routex.hub.user.service.application.dto.authentication.RefreshTokenCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.RefreshTokenResult;
-import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
+import vn.com.routex.hub.user.service.application.command.authentication.RefreshTokenCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.RefreshTokenResult;
+import vn.com.routex.hub.user.service.application.command.common.RequestContext;
 import vn.com.routex.hub.user.service.application.service.AuthenticationService;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
 import vn.com.routex.hub.user.service.interfaces.models.token.RefreshTokenRequest;
@@ -33,7 +32,7 @@ public class TokenManagementController {
     private final AuthenticationService authenticationService;
 
     @InitBinder
-    public void initBinder(WebDataBinder webDataBinder, WebRequest webRequest) {
+    public void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.setDisallowedFields("requestId", "requestDateTime", "channel", "data");
     }
 

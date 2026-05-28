@@ -1,6 +1,6 @@
 package vn.com.routex.hub.user.service.application.service.internal;
 
-import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
+import vn.com.routex.hub.user.service.application.command.common.RequestContext;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
 
 import java.math.BigDecimal;

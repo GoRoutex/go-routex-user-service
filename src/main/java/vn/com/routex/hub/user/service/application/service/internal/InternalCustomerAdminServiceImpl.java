@@ -2,7 +2,7 @@ package vn.com.routex.hub.user.service.application.service.internal;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
+import vn.com.routex.hub.user.service.application.command.common.RequestContext;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
 import vn.com.routex.hub.user.service.domain.customer.port.CustomerRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;

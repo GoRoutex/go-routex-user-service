@@ -2,7 +2,7 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.custom
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vn.com.routex.hub.user.service.application.dto.customer.CustomerMembershipView;
+import vn.com.routex.hub.user.service.application.command.customer.CustomerMembershipView;
 import vn.com.routex.hub.user.service.application.query.CustomerMembershipQueryRepository;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.customer.repository.SpringDataCustomerRepository;
 

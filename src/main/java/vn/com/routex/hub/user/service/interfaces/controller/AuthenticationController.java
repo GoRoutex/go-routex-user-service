@@ -9,23 +9,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.WebRequest;
-import vn.com.routex.hub.user.service.application.dto.authentication.ChangePasswordCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.ChangePasswordResult;
-import vn.com.routex.hub.user.service.application.dto.authentication.ForgotPasswordCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.ForgotPasswordResult;
-import vn.com.routex.hub.user.service.application.dto.authentication.LoginCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.LoginResult;
-import vn.com.routex.hub.user.service.application.dto.authentication.LogoutCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.RegistrationResult;
-import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.ResetPasswordResult;
-import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpCommand;
-import vn.com.routex.hub.user.service.application.dto.authentication.VerifyOtpResult;
-import vn.com.routex.hub.user.service.application.dto.common.RequestContext;
-import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationCommand;
-import vn.com.routex.hub.user.service.application.dto.verification.ResendVerificationResult;
+import vn.com.routex.hub.user.service.application.command.authentication.ChangePasswordCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.ChangePasswordResult;
+import vn.com.routex.hub.user.service.application.command.authentication.ForgotPasswordCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.ForgotPasswordResult;
+import vn.com.routex.hub.user.service.application.command.authentication.LoginCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.LoginResult;
+import vn.com.routex.hub.user.service.application.command.authentication.LogoutCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.RegistrationCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.RegistrationResult;
+import vn.com.routex.hub.user.service.application.command.authentication.ResetPasswordCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.ResetPasswordResult;
+import vn.com.routex.hub.user.service.application.command.authentication.VerifyOtpCommand;
+import vn.com.routex.hub.user.service.application.command.authentication.VerifyOtpResult;
+import vn.com.routex.hub.user.service.application.command.common.RequestContext;
+import vn.com.routex.hub.user.service.application.command.verification.ResendVerificationCommand;
+import vn.com.routex.hub.user.service.application.command.verification.ResendVerificationResult;
 import vn.com.routex.hub.user.service.application.service.AuthenticationService;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 import vn.com.routex.hub.user.service.interfaces.models.login.LoginRequest;
@@ -70,7 +69,7 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @InitBinder
-    public void initBinder(WebDataBinder webDataBinder, WebRequest webRequest) {
+    public void initBinder(WebDataBinder webDataBinder) {
         webDataBinder.setDisallowedFields("requestId", "requestDateTime", "channel", "data");
     }
 
@@ -254,7 +253,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
 
     }
-
 
     private RequestContext toContext(BaseRequest request) {
         return RequestContext.builder()

@@ -1,6 +1,6 @@
 package vn.com.routex.hub.user.service.application.query;
 
-import vn.com.routex.hub.user.service.application.dto.customer.CustomerMembershipView;
+import vn.com.routex.hub.user.service.application.command.customer.CustomerMembershipView;
 
 import java.util.Optional;
 
