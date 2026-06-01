@@ -1,7 +1,10 @@
 package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import vn.com.routex.hub.user.service.domain.common.PagedResult;
 import vn.com.routex.hub.user.service.domain.user.model.User;
 import vn.com.routex.hub.user.service.domain.user.port.UserRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.repository.UserEntityRepository;
@@ -26,10 +29,27 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public PagedResult<User> fetch(int pageNumber, int pageSize) {
+        Page<User> page = userEntityRepository.findAll(PageRequest.of(pageNumber, pageSize))
+                .map(userPersistenceMapper::toDomain);
+        return PagedResult.<User>builder()
+                .items(page.getContent())
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .build();
+    }
+
+    @Override
     public boolean existsByPhoneNumber(String phoneNumber) {
         return userEntityRepository.existsByPhoneNumber(phoneNumber);
     }
 
+    @Override
+    public boolean existsByPhoneNumberAndIdNot(String phoneNumber, String excludedId) {
+        return userEntityRepository.existsByPhoneNumberAndIdNot(phoneNumber, excludedId);
+    }
 
     @Override
     public User save(User user) {
@@ -39,5 +59,10 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByEmail(String email) {
         return userEntityRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean existsByEmailAndIdNot(String email, String excludedId) {
+        return userEntityRepository.existsByEmailAndIdNot(email, excludedId);
     }
 }
