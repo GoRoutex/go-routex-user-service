@@ -6,6 +6,8 @@ import vn.com.routex.hub.user.service.application.command.user.FetchUserDetailQu
 import vn.com.routex.hub.user.service.application.command.user.FetchUserDetailResult;
 import vn.com.routex.hub.user.service.application.command.user.FetchUsersQuery;
 import vn.com.routex.hub.user.service.application.command.user.FetchUsersResult;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserQuery;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserResult;
 import vn.com.routex.hub.user.service.application.command.user.UpdateUserCommand;
 import vn.com.routex.hub.user.service.application.command.user.UpdateUserResult;
 
@@ -13,6 +15,8 @@ public interface UserManagementService {
     FetchUsersResult fetchUsers(FetchUsersQuery query);
 
     FetchUserDetailResult fetchUserDetail(FetchUserDetailQuery query);
+
+    SearchUserResult searchUser(SearchUserQuery query);
 
     UpdateUserResult updateUser(UpdateUserCommand command);
 

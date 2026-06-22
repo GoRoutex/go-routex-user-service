@@ -9,9 +9,12 @@ import vn.com.routex.hub.user.service.application.command.user.FetchUserDetailQu
 import vn.com.routex.hub.user.service.application.command.user.FetchUserDetailResult;
 import vn.com.routex.hub.user.service.application.command.user.FetchUsersQuery;
 import vn.com.routex.hub.user.service.application.command.user.FetchUsersResult;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserQuery;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserResult;
 import vn.com.routex.hub.user.service.application.command.user.UpdateUserCommand;
 import vn.com.routex.hub.user.service.application.command.user.UpdateUserResult;
 import vn.com.routex.hub.user.service.application.service.UserManagementService;
+import vn.com.routex.hub.user.service.application.service.authorization.UserAuthorizationService;
 import vn.com.routex.hub.user.service.application.service.internal.InternalCustomerAdminService;
 import vn.com.routex.hub.user.service.domain.common.PagedResult;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
@@ -41,9 +44,11 @@ public class UserManagementServiceImpl implements UserManagementService {
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int DEFAULT_PAGE_NUMBER = 1;
     private static final int MAX_PAGE_SIZE = 100;
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private final UserRepositoryPort userRepositoryPort;
     private final InternalCustomerAdminService internalCustomerAdminService;
+    private final UserAuthorizationService userAuthorizationService;
 
     @Override
     public FetchUsersResult fetchUsers(FetchUsersQuery query) {
@@ -85,6 +90,22 @@ public class UserManagementServiceImpl implements UserManagementService {
     @Override
     public FetchUserDetailResult fetchUserDetail(FetchUserDetailQuery query) {
         return toFetchUserDetailResult(loadUser(query.userId(), query.context()));
+    }
+
+    @Override
+    public SearchUserResult searchUser(SearchUserQuery query) {
+        validateSearchCriteria(query);
+
+        List<User> users = userRepositoryPort.searchByKeyword(query.keyword(), query.page(), query.size());
+
+        List<SearchUserResult.SearchUserItemResult> items = users.stream()
+                .filter(user -> !hasExcludedRole(user.getId(), query.excludeRole()))
+                .map(user -> toSearchUserItem(user, query.context()))
+                .toList();
+
+        return SearchUserResult.builder()
+                .data(items)
+                .build();
     }
 
     @Override
@@ -146,6 +167,40 @@ public class UserManagementServiceImpl implements UserManagementService {
         }
     }
 
+    private void validateSearchCriteria(SearchUserQuery query) {
+        if (!hasText(query.keyword())) {
+            throw businessException(query.context(), INVALID_INPUT_ERROR, "keyword is required");
+        }
+    }
+
+    private boolean hasExcludedRole(String userId, String excludeRole) {
+        if (!hasText(excludeRole)) {
+            return false;
+        }
+
+        String normalizedRole = normalizeRole(excludeRole);
+        return userAuthorizationService.getRoles(userId).stream()
+                .map(this::normalizeRole)
+                .anyMatch(normalizedRole::equals);
+    }
+
+    private String normalizeRole(String role) {
+        String normalized = role.trim().toUpperCase();
+        return normalized.startsWith(ROLE_PREFIX) ? normalized : ROLE_PREFIX + normalized;
+    }
+
+    private SearchUserResult.SearchUserItemResult toSearchUserItem(User user, RequestContext context) {
+        Customer customer = internalCustomerAdminService.fetchCustomerByUserId(user.getId(), context);
+
+        return SearchUserResult.SearchUserItemResult.builder()
+                .userId(user.getId())
+                .fullName(customer.getFullName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
     private User loadUser(String userId, RequestContext context) {
         return userRepositoryPort.findById(userId)
                 .orElseThrow(() -> businessException(context, RECORD_NOT_FOUND, USER_NOT_FOUND_MESSAGE));
@@ -158,6 +213,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                 .fullName(customer.getFullName())
                 .phoneNumber(user.getPhoneNumber())
                 .avatarUrl(user.getAvatarUrl())
+                .roles(userAuthorizationService.getRoles(user.getId()))
                 .dob(user.getDob())
                 .gender(user.getGender())
                 .phoneVerified(user.getPhoneVerified())
@@ -234,6 +290,10 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     private String firstNonBlank(String candidate, String fallback) {
         return candidate == null || candidate.isBlank() ? fallback : candidate.trim();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private BusinessException businessException(RequestContext context, String code, String description) {

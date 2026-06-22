@@ -8,6 +8,7 @@ public class ApiConstant {
     public static final String ME_PATH = "/me";
     public static final String PROFILE_PATH = "/profile";
     public static final String FETCH_PATH = "/fetch";
+    public static final String SEARCH_PATH = "/search";
     public static final String DETAIL_PATH = "/detail";
     public static final String DELETE_PATH = "/delete";
     public static final String COMPLETE_PROFILE = "/complete-profile";

@@ -233,6 +233,7 @@ public class UserManagementController {
                 .fullName(item.fullName())
                 .phoneNumber(item.phoneNumber())
                 .avatarUrl(item.avatarUrl())
+                .roles(item.roles())
                 .dob(item.dob())
                 .gender(item.gender())
                 .phoneVerified(item.phoneVerified())

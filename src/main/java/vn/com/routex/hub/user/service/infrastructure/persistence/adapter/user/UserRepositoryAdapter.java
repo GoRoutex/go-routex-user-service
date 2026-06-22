@@ -3,17 +3,21 @@ package vn.com.routex.hub.user.service.infrastructure.persistence.adapter.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import vn.com.routex.hub.user.service.domain.common.PagedResult;
 import vn.com.routex.hub.user.service.domain.user.model.User;
 import vn.com.routex.hub.user.service.domain.user.port.UserRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.repository.UserEntityRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepositoryPort {
+
+    private static final int MAX_SEARCH_SIZE = 50;
 
     private final UserEntityRepository userEntityRepository;
     private final UserPersistenceMapper userPersistenceMapper;
@@ -26,6 +30,16 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public Optional<User> findByEmail(String email) {
         return userEntityRepository.findByEmail(email).map(userPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public List<User> searchByKeyword(String keyword, int page, int size) {
+        return userEntityRepository.searchByKeyword(
+                        keyword == null ? "" : keyword.trim(),
+                        PageRequest.of(Math.max(0, page), normalizeSearchSize(size), Sort.by(Sort.Order.asc("email")))
+                ).stream()
+                .map(userPersistenceMapper::toDomain)
+                .toList();
     }
 
     @Override
@@ -64,5 +78,9 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByEmailAndIdNot(String email, String excludedId) {
         return userEntityRepository.existsByEmailAndIdNot(email, excludedId);
+    }
+
+    private int normalizeSearchSize(int size) {
+        return Math.min(Math.max(size, 1), MAX_SEARCH_SIZE);
     }
 }

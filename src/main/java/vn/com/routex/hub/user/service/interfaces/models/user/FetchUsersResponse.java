@@ -12,6 +12,7 @@ import vn.com.routex.hub.user.service.interfaces.models.base.BaseResponse;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -40,6 +41,7 @@ public class FetchUsersResponse extends BaseResponse<FetchUsersResponse.FetchUse
         private String fullName;
         private String phoneNumber;
         private String avatarUrl;
+        private Set<String> roles;
         private LocalDate dob;
         private Gender gender;
         private Boolean phoneVerified;

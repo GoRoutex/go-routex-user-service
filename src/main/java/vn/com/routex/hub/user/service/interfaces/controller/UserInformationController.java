@@ -1,6 +1,7 @@
 package vn.com.routex.hub.user.service.interfaces.controller;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,12 @@ import vn.com.routex.hub.user.service.application.command.profile.GetUserProfile
 import vn.com.routex.hub.user.service.application.command.profile.GetUserProfileResult;
 import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileCommand;
 import vn.com.routex.hub.user.service.application.command.profile.UpdateProfileResult;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserQuery;
+import vn.com.routex.hub.user.service.application.command.user.SearchUserResult;
+import vn.com.routex.hub.user.service.application.service.UserManagementService;
 import vn.com.routex.hub.user.service.application.service.UserProfileService;
+import vn.com.routex.hub.user.service.infrastructure.utils.ApiRequestUtils;
+import vn.com.routex.hub.user.service.infrastructure.utils.HttpUtils;
 import vn.com.routex.hub.user.service.infrastructure.persistence.log.SystemLog;
 import vn.com.routex.hub.user.service.interfaces.models.base.BaseRequest;
 import vn.com.routex.hub.user.service.interfaces.models.profile.CompleteProfileRequest;
@@ -36,12 +42,14 @@ import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileReq
 import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileResponse;
 import vn.com.routex.hub.user.service.interfaces.models.profile.UpdateProfileResponse.UpdateProfileResponseData;
 import vn.com.routex.hub.user.service.interfaces.models.result.ApiResult;
+import vn.com.routex.hub.user.service.interfaces.models.user.SearchUserResponse;
 
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.API_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.API_VERSION;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.COMPLETE_PROFILE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.ME_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.PROFILE_PATH;
+import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.SEARCH_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.UPDATE_PATH;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ApiConstant.USER_SERVICE;
 import static vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant.SUCCESS_CODE;
@@ -52,7 +60,10 @@ import static vn.com.routex.hub.user.service.infrastructure.persistence.constant
 @RequiredArgsConstructor
 public class UserInformationController {
 
+    private static final String DEFAULT_EXCLUDED_SEARCH_ROLE = "DRIVER";
+
     private final UserProfileService userProfileService;
+    private final UserManagementService userManagementService;
     private final SystemLog sLog = SystemLog.getLogger(this.getClass());
 
     @InitBinder
@@ -119,6 +130,43 @@ public class UserInformationController {
                 .membership(myMembership)
                 .stats(myStats)
                 .build());
+    }
+
+    @GetMapping(SEARCH_PATH)
+    public ResponseEntity<SearchUserResponse> searchUser(
+            HttpServletRequest servletRequest,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = DEFAULT_EXCLUDED_SEARCH_ROLE) String excludeRole,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        BaseRequest baseRequest = ApiRequestUtils.getBaseRequestOrDefault(servletRequest);
+
+        SearchUserResult result = userManagementService.searchUser(SearchUserQuery.builder()
+                .context(HttpUtils.toContext(baseRequest))
+                .keyword(keyword)
+                .excludeRole(excludeRole)
+                .page(page)
+                .size(size)
+                .build());
+
+        SearchUserResponse response = SearchUserResponse.builder()
+                .result(ApiResult.buildSuccess())
+                .data(result.data().stream()
+                        .map(this::toSearchUserResponseData)
+                        .toList())
+                .build();
+
+        return HttpUtils.buildResponse(baseRequest, response);
+    }
+
+    private SearchUserResponse.SearchUserResponseData toSearchUserResponseData(SearchUserResult.SearchUserItemResult result) {
+        return SearchUserResponse.SearchUserResponseData.builder()
+                .userId(result.userId())
+                .fullName(result.fullName())
+                .phoneNumber(result.phoneNumber())
+                .email(result.email())
+                .avatarUrl(result.avatarUrl())
+                .build();
     }
 
     @PostMapping(PROFILE_PATH)

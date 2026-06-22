@@ -7,6 +7,7 @@ import vn.com.routex.hub.user.service.domain.user.model.UserStatus;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Builder
 public record FetchUsersResult(
@@ -23,6 +24,7 @@ public record FetchUsersResult(
             String fullName,
             String phoneNumber,
             String avatarUrl,
+            Set<String> roles,
             LocalDate dob,
             Gender gender,
             Boolean phoneVerified,
