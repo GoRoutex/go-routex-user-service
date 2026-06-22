@@ -4,8 +4,13 @@ public class ApiConstant {
     public static final String API_PATH = "/api";
     public static final String API_VERSION = "/v1";
     public static final String USER_SERVICE = "/user-service";
+    public static final String MANAGEMENT_PATH = "/management";
     public static final String ME_PATH = "/me";
     public static final String PROFILE_PATH = "/profile";
+    public static final String FETCH_PATH = "/fetch";
+    public static final String SEARCH_PATH = "/search";
+    public static final String DETAIL_PATH = "/detail";
+    public static final String DELETE_PATH = "/delete";
     public static final String COMPLETE_PROFILE = "/complete-profile";
     public static final String AUTHENTICATION = "/authentication";
     public static final String UPDATE_PATH = "/update";

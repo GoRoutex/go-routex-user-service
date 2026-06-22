@@ -9,6 +9,8 @@ option java_outer_classname = "UserAdminServiceProto";
 service UserAdminGrpcService {
     rpc fetchCustomerByUserId (FetchCustomerByUserIdRequest) returns (FetchCustomerByUserIdResponse);
     rpc fetchCustomersByUserIds (FetchCustomersByUserIdsRequest) returns (FetchCustomersByUserIdsResponse);
+    rpc fetchUserAccountById (FetchUserAccountByIdRequest) returns (FetchUserAccountResponse);
+    rpc fetchUserAccountByEmail (FetchUserAccountByEmailRequest) returns (FetchUserAccountResponse);
 }
 
 message UserAdminRequestContext {
@@ -45,4 +47,25 @@ message FetchCustomersByUserIdsRequest {
 
 message FetchCustomersByUserIdsResponse {
     repeated CustomerAdminInfo customers = 1;
+}
+
+message FetchUserAccountByIdRequest {
+    string userId = 1;
+    UserAdminRequestContext context = 2;
+}
+
+message FetchUserAccountByEmailRequest {
+    string email = 1;
+    UserAdminRequestContext context = 2;
+}
+
+message UserAccountInfo {
+    string id = 1;
+    string email = 2;
+    string phoneNumber = 3;
+    string status = 4;
+}
+
+message FetchUserAccountResponse {
+    UserAccountInfo user = 1;
 }

@@ -9,19 +9,27 @@ import vn.com.routex.hub.grpc.FetchCustomerByUserIdRequest;
 import vn.com.routex.hub.grpc.FetchCustomerByUserIdResponse;
 import vn.com.routex.hub.grpc.FetchCustomersByUserIdsRequest;
 import vn.com.routex.hub.grpc.FetchCustomersByUserIdsResponse;
+import vn.com.routex.hub.grpc.FetchUserAccountByEmailRequest;
+import vn.com.routex.hub.grpc.FetchUserAccountByIdRequest;
+import vn.com.routex.hub.grpc.FetchUserAccountResponse;
+import vn.com.routex.hub.grpc.UserAccountInfo;
 import vn.com.routex.hub.grpc.UserAdminGrpcServiceGrpc;
 import vn.com.routex.hub.grpc.UserAdminRequestContext;
 import vn.com.routex.hub.user.service.application.command.common.RequestContext;
 import vn.com.routex.hub.user.service.application.service.internal.InternalCustomerAdminService;
 import vn.com.routex.hub.user.service.domain.customer.model.Customer;
+import vn.com.routex.hub.user.service.domain.user.model.User;
+import vn.com.routex.hub.user.service.domain.user.port.UserRepositoryPort;
 import vn.com.routex.hub.user.service.infrastructure.persistence.constant.ErrorConstant;
 import vn.com.routex.hub.user.service.infrastructure.persistence.exception.BusinessException;
+import vn.com.routex.hub.user.service.infrastructure.utils.ExceptionUtils;
 
 @GrpcService
 @RequiredArgsConstructor
 public class UserAdminGrpcServiceImpl extends UserAdminGrpcServiceGrpc.UserAdminGrpcServiceImplBase {
 
     private final InternalCustomerAdminService internalCustomerAdminService;
+    private final UserRepositoryPort userRepositoryPort;
 
     @Override
     public void fetchCustomerByUserId(FetchCustomerByUserIdRequest request,
@@ -55,6 +63,46 @@ public class UserAdminGrpcServiceImpl extends UserAdminGrpcServiceGrpc.UserAdmin
         }
     }
 
+    @Override
+    public void fetchUserAccountById(FetchUserAccountByIdRequest request,
+                                     StreamObserver<FetchUserAccountResponse> responseObserver) {
+        try {
+            User user = userRepositoryPort.findById(request.getUserId())
+                    .orElseThrow(() -> new BusinessException(
+                            request.getContext().getRequestId(),
+                            request.getContext().getRequestDateTime(),
+                            request.getContext().getChannel(),
+                            ExceptionUtils.buildResultResponse(ErrorConstant.RECORD_NOT_FOUND, "User account not found")
+                    ));
+            responseObserver.onNext(FetchUserAccountResponse.newBuilder()
+                    .setUser(mapUserAccountInfo(user))
+                    .build());
+            responseObserver.onCompleted();
+        } catch (Exception ex) {
+            handleException(ex, responseObserver);
+        }
+    }
+
+    @Override
+    public void fetchUserAccountByEmail(FetchUserAccountByEmailRequest request,
+                                        StreamObserver<FetchUserAccountResponse> responseObserver) {
+        try {
+            User user = userRepositoryPort.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new BusinessException(
+                            request.getContext().getRequestId(),
+                            request.getContext().getRequestDateTime(),
+                            request.getContext().getChannel(),
+                            ExceptionUtils.buildResultResponse(ErrorConstant.RECORD_NOT_FOUND, "User account not found")
+                    ));
+            responseObserver.onNext(FetchUserAccountResponse.newBuilder()
+                    .setUser(mapUserAccountInfo(user))
+                    .build());
+            responseObserver.onCompleted();
+        } catch (Exception ex) {
+            handleException(ex, responseObserver);
+        }
+    }
+
     private RequestContext toRequestContext(UserAdminRequestContext context) {
         if (context == null) {
             return RequestContext.builder().build();
@@ -80,6 +128,18 @@ public class UserAdminGrpcServiceImpl extends UserAdminGrpcServiceGrpc.UserAdmin
                 .setTotalSpent(customer.getTotalSpent() != null ? customer.getTotalSpent().toString() : "")
                 .setLastBookingAt(customer.getLastBookingAt() != null ? customer.getLastBookingAt().toString() : "")
                 .setLastTripAt(customer.getLastTripAt() != null ? customer.getLastTripAt().toString() : "")
+                .build();
+    }
+
+    private UserAccountInfo mapUserAccountInfo(User user) {
+        if (user == null) {
+            return UserAccountInfo.getDefaultInstance();
+        }
+        return UserAccountInfo.newBuilder()
+                .setId(user.getId() != null ? user.getId() : "")
+                .setEmail(user.getEmail() != null ? user.getEmail() : "")
+                .setPhoneNumber(user.getPhoneNumber() != null ? user.getPhoneNumber() : "")
+                .setStatus(user.getStatus() != null ? user.getStatus().name() : "")
                 .build();
     }
 
