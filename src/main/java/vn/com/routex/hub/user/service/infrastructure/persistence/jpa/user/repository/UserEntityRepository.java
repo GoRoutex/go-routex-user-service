@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import vn.com.routex.hub.user.service.infrastructure.persistence.jpa.user.entity.UserEntity;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface UserEntityRepository extends JpaRepository<UserEntity, String> {
