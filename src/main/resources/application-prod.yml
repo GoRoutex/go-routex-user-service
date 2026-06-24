@@ -1,7 +1,7 @@
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:kafka:9092}
@@ -22,7 +22,7 @@ spring:
       connect-timeout: 30000
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgresql.postgresql.svc.cluster.local:5432/routex}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/routex}
     username: ${SPRING_DATASOURCE_USERNAME:routex}
     password: ${SPRING_DATASOURCE_PASSWORD}
 
@@ -30,3 +30,8 @@ spring:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:validate}
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
+
+grpc:
+  client:
+    merchantService:
+      address: ${MERCHANT_SERVICE_GRPC_ADDRESS:static://go-routex-platform-core:9090}
